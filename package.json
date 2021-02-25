@@ -1,0 +1,46 @@
+{
+  "name": "actix-openapi-preset",
+  "version": "0.1.0",
+  "description": "Generate types for Rust Actix Web",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "prepublishOnly": "yarn build",
+    "build": "babel -d ./dist --extensions '.ts' ./src",
+    "example": "yarn build && openapi --config ./example/.openapi.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openapi/actix-preset.git"
+  },
+  "keywords": [
+    "openapi",
+    "preset",
+    "actix",
+    "rust",
+    "server",
+    "web",
+    "api",
+    "generator"
+  ],
+  "author": "Sergey Sova <mail@sergeysova.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/openapi/actix-preset/issues"
+  },
+  "homepage": "https://github.com/openapi/actix-preset#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.13.0",
+    "@babel/core": "^7.13.1",
+    "@babel/preset-env": "^7.13.5",
+    "@babel/preset-typescript": "^7.13.0",
+    "@types/jest": "^26.0.20",
+    "openapi": "^2.0.0-13",
+    "openapi-types": "^7.2.3",
+    "prettier": "^2.2.1",
+    "typescript": "^4.2.2"
+  },
+  "dependencies": {
+    "change-case": "^4.1.2"
+  }
+}
