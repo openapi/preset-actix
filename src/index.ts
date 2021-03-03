@@ -81,8 +81,20 @@ const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, 
         components.push(mod('parameters', [...parametersExtras, ...parameters.values()].join('')));
       }
 
+      if (true) {
+        components.push(mod('responses', [].join('')));
+      }
+
+      if (true) {
+        components.push(mod('request_bodies', [].join('')));
+      }
+
+      if (true) {
+        components.push(mod('schemas', [].join('')));
+      }
+
       if (components.length) {
-        chunks.push(mod('components', components.join('\n')));
+        chunks.push(mod('components', components.join('')));
       }
 
       files.addFile(

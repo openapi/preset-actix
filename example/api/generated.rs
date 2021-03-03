@@ -437,3 +437,19 @@ pub mod paths {
     }
 
 }
+
+pub mod components {
+
+    pub mod responses {
+
+    }
+
+    pub mod request_bodies {
+
+    }
+
+    pub mod schemas {
+
+    }
+
+}
