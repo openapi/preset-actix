@@ -480,3 +480,18 @@ components:
           type: string
         lastName:
           type: string
+        list:
+          type: array
+          items:
+            type: string
+        refList:
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionUser'
+        enumeration:
+          type: string
+          enum:
+            - First
+            - Second
+            - third
+            - the-latest

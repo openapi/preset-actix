@@ -6,14 +6,75 @@ interface Options {
   fileName?: string;
 }
 
+class Components {
+  private extras = new Set<string>();
+  private components = new Map<string, string>();
+
+  addExtra(extra: string) {
+    this.extras.add(extra);
+  }
+
+  addComponent(name: string, component: string) {
+    this.components.set(name, component);
+  }
+
+  hasItems() {
+    return this.components.size !== 0;
+  }
+
+  build(): string {
+    return [...this.extras, ...this.components.values()].join('');
+  }
+}
+
 const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, internal) => {
-  const parametersExtras = new Set<string>();
-  const parameters = new Map<string, string>();
+  const parameters = new Components();
+  const schemas = new Components();
 
   function addHeader(name: string, header: string) {
-    parametersExtras.add(HeaderExtractor);
+    parameters.addExtra(HeaderExtractor);
     const struct = changeCase.pascalCase(name);
-    parameters.set(struct, headerStructure(struct, header));
+    parameters.addComponent(struct, headerStructure(struct, header));
+  }
+
+  function traverseSchema(name: string, schema: OpenAPIV3.SchemaObject): string {
+    schemas.addExtra(SchemasExtra);
+
+    if (isSchemaArray(schema)) {
+      schemas.addExtra(UseParentComponents);
+      const itemsType = internal.isRef(schema.items)
+        ? refToRust(schema.items.$ref)
+        : traverseSchema(`${name}_Item`, schema.items);
+
+      schemas.addComponent(name, vec(name, itemsType));
+    } else {
+      let component = '';
+
+      if (schema.type === 'string' && schema.enum) {
+        component = enumeration(
+          name,
+          new Set(schema.enum),
+          '#[derive(Debug, Serialize, Deserialize)]',
+        );
+      } else if (schema.type === 'object' && schema.properties) {
+        const fields = new Map<string, string>();
+        for (const [propName, type] of Object.entries(schema.properties)) {
+          const optional = schema.required?.includes(propName) ?? false;
+          const realType = internal.isRef(type)
+            ? (schemas.addExtra(UseParentComponents), refToRust(type.$ref))
+            : traverseSchema(`${name}_${propName}`, type);
+          const content = optional ? `Option<${realType}>` : realType;
+
+          fields.set(name, content);
+        }
+        component = struct(name, fields, DeriveSerde);
+      } else {
+        return typeToRust(schema.type);
+      }
+
+      schemas.addComponent(name, component);
+    }
+    return `components::schemas::${changeCase.pascalCase(name)}`;
   }
 
   const apiPaths = new Map<string, { api: string; path: string }>();
@@ -25,6 +86,10 @@ const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, 
       if (parameter.in === 'header') {
         addHeader(name, parameter.name);
       }
+    },
+
+    onSchema(name, schema) {
+      traverseSchema(name, schema);
     },
 
     onOperation(pattern, method, operation) {
@@ -76,25 +141,26 @@ const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, 
         ),
       );
 
-      const components = [];
-      if (parameters.size) {
-        components.push(mod('parameters', [...parametersExtras, ...parameters.values()].join('')));
+      const components = new Set<string>();
+
+      if (parameters.hasItems()) {
+        components.add(mod('parameters', parameters.build()));
       }
 
       if (true) {
-        components.push(mod('responses', [].join('')));
+        components.add(mod('responses', [].join('')));
       }
 
       if (true) {
-        components.push(mod('request_bodies', [].join('')));
+        components.add(mod('request_bodies', [].join('')));
       }
 
-      if (true) {
-        components.push(mod('schemas', [].join('')));
+      if (schemas.hasItems()) {
+        components.add(mod('schemas', schemas.build()));
       }
 
-      if (components.length) {
-        chunks.push(mod('components', components.join('')));
+      if (components.size) {
+        chunks.push(mod('components', Array.from(components).join('')));
       }
 
       files.addFile(
@@ -277,9 +343,77 @@ ${tabulate(children)}
 `;
 }
 
+const SchemasExtra = `use serde::{Deserialize, Serialize};
+`;
+
+const DeriveSerde = `#[derive(Debug, Serialize, Deserialize)]`;
+const UseParentComponents = `use super as components;
+`;
+
+function struct(name: string, fields: Map<string, string>, derive = '') {
+  const structName = changeCase.pascalCase(name);
+  const lines = [];
+  for (const [property, type] of fields.entries()) {
+    const snakeName = changeCase.snakeCase(property);
+    if (snakeName !== property) {
+      lines.push(`#[serde(rename = "${property}")]`);
+    }
+    lines.push(`pub ${snakeName}: ${type},`);
+  }
+  return `
+${derive}
+pub struct ${structName} {
+${lines.map((i) => tabulate(i)).join('\n')}
+}
+`;
+}
+
+function enumeration(name: string, variants: Set<string>, derive = ''): string {
+  const enumName = changeCase.pascalCase(name);
+  const lines = [];
+
+  for (const variant of variants) {
+    const pascalName = changeCase.pascalCase(variant);
+    if (pascalName !== variant) {
+      lines.push(`#[serde(rename = "${variant}")]`);
+    }
+    lines.push(`${pascalName},`);
+  }
+
+  return `
+${derive}
+pub enum ${enumName} {
+${lines.map((i) => tabulate(i)).join('\n')}
+}
+`;
+}
+
+function vec(name: string, itemsType: string) {
+  const typeName = changeCase.pascalCase(name);
+  return `
+pub type ${typeName} = std::vec::Vec<${itemsType}>;
+`;
+}
+
+function typeToRust(type: string): string {
+  return type;
+}
+
 function tabulate(content: string, count = 1): string {
   const prefix = Array.from({ length: count }, () => `    `).join('');
   return content.replace(/^./gm, (s) => `${prefix}${s}`);
 }
 
 module.exports = preset;
+
+function isSchemaArray(schema: OpenAPIV3.SchemaObject): schema is OpenAPIV3.ArraySchemaObject {
+  return schema.type === 'array' || schema['items'];
+}
+
+function refToRust(ref: string): string {
+  if (ref[0] !== '#') {
+    throw new TypeError('Non local references does not supported inside openapi');
+  }
+  const path = ref.replace('#', '').replace(/^\//, '').replace(/\//gi, '::');
+  return `${path}`;
+}

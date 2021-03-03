@@ -449,6 +449,28 @@ pub mod components {
     }
 
     pub mod schemas {
+        use serde::{Deserialize, Serialize};
+        use super as components;
+
+        pub type SessionUserList = std::vec::Vec<string>;
+
+        pub type SessionUserRefList = std::vec::Vec<components::schemas::SessionUser>;
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum SessionUserEnumeration {
+            First,
+            Second,
+            #[serde(rename = "third")]
+            Third,
+            #[serde(rename = "the-latest")]
+            TheLatest,
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct SessionUser {
+            #[serde(rename = "SessionUser")]
+            pub session_user: components::schemas::SessionUserEnumeration,
+        }
 
     }
 
