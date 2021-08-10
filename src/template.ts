@@ -1,6 +1,7 @@
 import * as changeCase from 'change-case';
 import { status } from 'openapi';
 
+// language=Rust
 export const HeaderExtractor = `
 #[derive(Debug, Clone, serde::Serialize)]
 struct ParseHeaderError {
@@ -21,6 +22,7 @@ fn extract_header(req: &actix_web::HttpRequest, name: String) -> Result<String, 
 `;
 
 export function headerStructure(name: string, header: string): string {
+  // language=Rust
   return `
 pub struct ${name}(pub String);
 
@@ -47,6 +49,7 @@ impl actix_web::FromRequest for ${name} {
 
 export function apiStruct(apiName: string, methods: string): string {
   const struct = changeCase.pascalCase(apiName);
+
   return `
 pub struct ${struct} {
     api: actix_swagger::Api,
@@ -68,17 +71,23 @@ ${impl(struct, methods)}
 
 export function pathBind(operationId: string, path: string, method: string): string {
   const snake = changeCase.snakeCase(operationId);
+
+  // language=Rust
   return `
 pub fn bind_${snake}<F, T, R>(mut self, handler: F) -> Self
 where
-    F: actix_web::dev::Factory<T, R, actix_swagger::Answer<'static, super::paths::${snake}::Response>>,
-    T: actix_web::FromRequest + 'static,
-    R: std::future::Future<Output = actix_swagger::Answer<'static, super::paths::${snake}::Response>>
-        + 'static,
+    F: ::actix_web::dev::Handler<T, R>,
+    T: ::actix_web::FromRequest + 'static,
+    R: ::std::future::Future<
+            Output = ::std::result::Result<
+                super::paths::${snake}::Response,
+                super::paths::${snake}::Error,
+            >,
+        > + 'static,
 {
     self.api = self
         .api
-        .bind("${path}".to_owned(), actix_swagger::Method::${method.toUpperCase()}, handler);
+        .bind("${path}".to_owned(), ::actix_swagger::Method::${method.toUpperCase()}, handler);
     self
 }
 `;
@@ -97,7 +106,10 @@ export function pathModule(
       return { upper, label, code, contentType, name };
     });
 
-  const enumVariants = variants
+  const okVariants = variants.filter(({ code }) => code >= 200 && code < 400);
+  const errVariants = variants.filter(({ code }) => code >= 400 && code < 700);
+
+  const responseVariants = okVariants
     .map((variant) => {
       const content = variant.contentType ? `(responses::${variant.name})` : '';
       const name = changeCase.pascalCase(variant.upper);
@@ -105,7 +117,34 @@ export function pathModule(
     })
     .join(',\n');
 
-  const statusMatchers = variants
+  const responseMatchers = okVariants
+    .map((variant) => {
+      // Response::Ok(r) => HttpResponse::build(StatusCode::OK).json(r),
+      // Response::Ok => HttpResponse::build(StatusCode::OK).finish(),
+      const hasContent = Boolean(variant.contentType);
+
+      const tpl = hasContent
+        ? 'Response::<Status>(body) => ::actix_web::HttpResponse::build(StatusCode::<STATUS>).json(body)'
+        : 'Response::<Status> => ::actix_web::HttpResponse::build(StatusCode::<STATUS>).finish()';
+
+      return tpl
+        .replace('<Status>', changeCase.pascalCase(variant.upper))
+        .replace('<STATUS>', variant.upper);
+    })
+    .join(',\n');
+
+  const errorVariants = errVariants
+    .map((variant) => {
+      const content = variant.contentType
+        ? `responses::${variant.name}`
+        : `#[serde(skip)] ::eyre::Report`;
+      const name = changeCase.pascalCase(variant.upper);
+      const inference = variant.code === 500 ? 'from' : 'source'; // to handle `error?;`
+      return `${name}(#[${inference}] ${content})`;
+    })
+    .join(',\n');
+
+  const errorStatusMatchers = errVariants
     .map((variant) => {
       const matcher = variant.contentType ? `(_)` : '';
       const name = changeCase.pascalCase(variant.upper);
@@ -113,7 +152,7 @@ export function pathModule(
     })
     .join(',\n');
 
-  const contentTypeMatcher = variants
+  const contentTypeMatcher = errVariants
     .map((variant) => {
       const matcher = variant.contentType ? `(_)` : '';
       const content = variant.contentType ? `Some(ContentType::Json)` : 'None';
@@ -122,36 +161,63 @@ export function pathModule(
     })
     .join(',\n');
 
+  const specialization =
+    errVariants.length === 1 && errVariants[0].code === 500
+      ? ''
+      : // language=Rust
+        `
+fn error_response(&self) -> ::actix_web::HttpResponse {
+    let content_type = match self {
+        ${tabulate(contentTypeMatcher, 2, true)}
+    };
+    
+    let mut res = &mut ::actix_web::HttpResponse::build(self.status_code());
+    if let Some(content_type) = content_type {
+        res = res.content_type(content_type.to_string());
+
+        match content_type {
+            ContentType::Json => res.json(self),
+            ContentType::FormData => res.body(serde_plain::to_string(self).unwrap()),
+        }
+    } else {
+        ::actix_web::HttpResponse::InternalServerError().finish()
+    }
+}`.trim();
+
+  // language=Rust
   return `
 pub mod ${moduleName} {
     use super::responses;
-    use actix_swagger::ContentType;
-    use actix_web::http::StatusCode;
-    use serde::Serialize;
-
-    pub type Answer = actix_swagger::Answer<'static, Response>;
+    use ::actix_swagger::ContentType;
+    use ::actix_web::http::StatusCode;
+    use ::serde::Serialize;
 
     #[derive(Debug, Serialize)]
     #[serde(untagged)]
-    pub enum Response {
-${tabulate(enumVariants, 2)}
+    pub enum Response { 
+        ${tabulate(responseVariants, 2, true)}
+    }
+    
+    impl ::actix_web::Responder for Response {
+        fn respond_to(self, _: &::actix_web::HttpRequest) -> ::actix_web::HttpResponse {
+            match self { 
+                ${tabulate(responseMatchers, 4, true)}
+            }
+        }
     }
 
-    impl Response {
-        #[inline]
-        pub fn answer<'a>(self) -> actix_swagger::Answer<'a, Self> {
-            let status = match self {
-${tabulate(statusMatchers, 4)}
-            };
-
-            let content_type = match self {
-${tabulate(contentTypeMatcher, 4)}
-            };
-
-            actix_swagger::Answer::new(self)
-                .status(status)
-                .content_type(content_type)
+    #[derive(Debug, Serialize, ::thiserror::Error)]
+    pub enum Error {
+        ${tabulate(errorVariants, 2, true)}
+    }
+    
+    impl ::actix_web::ResponseError for Error {
+        fn status_code(&self) -> StatusCode {
+            match self { 
+                ${tabulate(errorStatusMatchers, 4, true)}
+            }
         }
+        ${specialization ? tabulate(specialization, 2, true) : ''}
     }
 }
 `;
@@ -173,9 +239,12 @@ ${tabulate(children)}
 `;
 }
 
+// language=Rust
 export const SchemasExtra = `use serde::{Deserialize, Serialize};
 `;
+
 export const DeriveSerde = `#[derive(Debug, Serialize, Deserialize)]`;
+// language=Rust
 export const UseParentComponents = `use super as components;
 `;
 
@@ -228,7 +297,11 @@ export function typeToRust(type: string): string {
   return type;
 }
 
-function tabulate(content: string, count = 1): string {
+function tabulate(content: string, count = 1, noFirst = false): string {
   const prefix = Array.from({ length: count }, () => `    `).join('');
-  return content.replace(/^./gm, (s) => `${prefix}${s}`);
+  const prefixed = content.replace(/^./gm, (s) => `${prefix}${s}`);
+  if (noFirst) {
+    return prefixed.trimStart();
+  }
+  return prefixed;
 }

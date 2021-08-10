@@ -115,8 +115,6 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/SessionGetSuccess'
-        401:
-          description: User not authorized
         500:
           description: Something went wrong
 

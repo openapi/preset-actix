@@ -20,105 +20,137 @@ pub mod api {
 
         pub fn bind_oauth_authorize_request<F, T, R>(mut self, handler: F) -> Self
         where
-            F: actix_web::dev::Factory<T, R, actix_swagger::Answer<'static, super::paths::oauth_authorize_request::Response>>,
-            T: actix_web::FromRequest + 'static,
-            R: std::future::Future<Output = actix_swagger::Answer<'static, super::paths::oauth_authorize_request::Response>>
-                + 'static,
+            F: ::actix_web::dev::Handler<T, R>,
+            T: ::actix_web::FromRequest + 'static,
+            R: ::std::future::Future<
+                    Output = ::std::result::Result<
+                        super::paths::oauth_authorize_request::Response,
+                        super::paths::oauth_authorize_request::Error,
+                    >,
+                > + 'static,
         {
             self.api = self
                 .api
-                .bind("/oauth/authorize".to_owned(), actix_swagger::Method::POST, handler);
+                .bind("/oauth/authorize".to_owned(), ::actix_swagger::Method::POST, handler);
             self
         }
 
         pub fn bind_access_recovery_send_email<F, T, R>(mut self, handler: F) -> Self
         where
-            F: actix_web::dev::Factory<T, R, actix_swagger::Answer<'static, super::paths::access_recovery_send_email::Response>>,
-            T: actix_web::FromRequest + 'static,
-            R: std::future::Future<Output = actix_swagger::Answer<'static, super::paths::access_recovery_send_email::Response>>
-                + 'static,
+            F: ::actix_web::dev::Handler<T, R>,
+            T: ::actix_web::FromRequest + 'static,
+            R: ::std::future::Future<
+                    Output = ::std::result::Result<
+                        super::paths::access_recovery_send_email::Response,
+                        super::paths::access_recovery_send_email::Error,
+                    >,
+                > + 'static,
         {
             self.api = self
                 .api
-                .bind("/access-recovery/send-email".to_owned(), actix_swagger::Method::POST, handler);
+                .bind("/access-recovery/send-email".to_owned(), ::actix_swagger::Method::POST, handler);
             self
         }
 
         pub fn bind_access_recovery_set_password<F, T, R>(mut self, handler: F) -> Self
         where
-            F: actix_web::dev::Factory<T, R, actix_swagger::Answer<'static, super::paths::access_recovery_set_password::Response>>,
-            T: actix_web::FromRequest + 'static,
-            R: std::future::Future<Output = actix_swagger::Answer<'static, super::paths::access_recovery_set_password::Response>>
-                + 'static,
+            F: ::actix_web::dev::Handler<T, R>,
+            T: ::actix_web::FromRequest + 'static,
+            R: ::std::future::Future<
+                    Output = ::std::result::Result<
+                        super::paths::access_recovery_set_password::Response,
+                        super::paths::access_recovery_set_password::Error,
+                    >,
+                > + 'static,
         {
             self.api = self
                 .api
-                .bind("/access-recovery/set-password".to_owned(), actix_swagger::Method::POST, handler);
+                .bind("/access-recovery/set-password".to_owned(), ::actix_swagger::Method::POST, handler);
             self
         }
 
         pub fn bind_register_request<F, T, R>(mut self, handler: F) -> Self
         where
-            F: actix_web::dev::Factory<T, R, actix_swagger::Answer<'static, super::paths::register_request::Response>>,
-            T: actix_web::FromRequest + 'static,
-            R: std::future::Future<Output = actix_swagger::Answer<'static, super::paths::register_request::Response>>
-                + 'static,
+            F: ::actix_web::dev::Handler<T, R>,
+            T: ::actix_web::FromRequest + 'static,
+            R: ::std::future::Future<
+                    Output = ::std::result::Result<
+                        super::paths::register_request::Response,
+                        super::paths::register_request::Error,
+                    >,
+                > + 'static,
         {
             self.api = self
                 .api
-                .bind("/register/request".to_owned(), actix_swagger::Method::POST, handler);
+                .bind("/register/request".to_owned(), ::actix_swagger::Method::POST, handler);
             self
         }
 
         pub fn bind_register_confirmation<F, T, R>(mut self, handler: F) -> Self
         where
-            F: actix_web::dev::Factory<T, R, actix_swagger::Answer<'static, super::paths::register_confirmation::Response>>,
-            T: actix_web::FromRequest + 'static,
-            R: std::future::Future<Output = actix_swagger::Answer<'static, super::paths::register_confirmation::Response>>
-                + 'static,
+            F: ::actix_web::dev::Handler<T, R>,
+            T: ::actix_web::FromRequest + 'static,
+            R: ::std::future::Future<
+                    Output = ::std::result::Result<
+                        super::paths::register_confirmation::Response,
+                        super::paths::register_confirmation::Error,
+                    >,
+                > + 'static,
         {
             self.api = self
                 .api
-                .bind("/register/confirmation".to_owned(), actix_swagger::Method::POST, handler);
+                .bind("/register/confirmation".to_owned(), ::actix_swagger::Method::POST, handler);
             self
         }
 
         pub fn bind_session_create<F, T, R>(mut self, handler: F) -> Self
         where
-            F: actix_web::dev::Factory<T, R, actix_swagger::Answer<'static, super::paths::session_create::Response>>,
-            T: actix_web::FromRequest + 'static,
-            R: std::future::Future<Output = actix_swagger::Answer<'static, super::paths::session_create::Response>>
-                + 'static,
+            F: ::actix_web::dev::Handler<T, R>,
+            T: ::actix_web::FromRequest + 'static,
+            R: ::std::future::Future<
+                    Output = ::std::result::Result<
+                        super::paths::session_create::Response,
+                        super::paths::session_create::Error,
+                    >,
+                > + 'static,
         {
             self.api = self
                 .api
-                .bind("/session/create".to_owned(), actix_swagger::Method::POST, handler);
+                .bind("/session/create".to_owned(), ::actix_swagger::Method::POST, handler);
             self
         }
 
         pub fn bind_session_get<F, T, R>(mut self, handler: F) -> Self
         where
-            F: actix_web::dev::Factory<T, R, actix_swagger::Answer<'static, super::paths::session_get::Response>>,
-            T: actix_web::FromRequest + 'static,
-            R: std::future::Future<Output = actix_swagger::Answer<'static, super::paths::session_get::Response>>
-                + 'static,
+            F: ::actix_web::dev::Handler<T, R>,
+            T: ::actix_web::FromRequest + 'static,
+            R: ::std::future::Future<
+                    Output = ::std::result::Result<
+                        super::paths::session_get::Response,
+                        super::paths::session_get::Error,
+                    >,
+                > + 'static,
         {
             self.api = self
                 .api
-                .bind("/session/get".to_owned(), actix_swagger::Method::POST, handler);
+                .bind("/session/get".to_owned(), ::actix_swagger::Method::POST, handler);
             self
         }
 
         pub fn bind_session_delete<F, T, R>(mut self, handler: F) -> Self
         where
-            F: actix_web::dev::Factory<T, R, actix_swagger::Answer<'static, super::paths::session_delete::Response>>,
-            T: actix_web::FromRequest + 'static,
-            R: std::future::Future<Output = actix_swagger::Answer<'static, super::paths::session_delete::Response>>
-                + 'static,
+            F: ::actix_web::dev::Handler<T, R>,
+            T: ::actix_web::FromRequest + 'static,
+            R: ::std::future::Future<
+                    Output = ::std::result::Result<
+                        super::paths::session_delete::Response,
+                        super::paths::session_delete::Error,
+                    >,
+                > + 'static,
         {
             self.api = self
                 .api
-                .bind("/session/delete".to_owned(), actix_swagger::Method::POST, handler);
+                .bind("/session/delete".to_owned(), ::actix_swagger::Method::POST, handler);
             self
         }
 
@@ -131,307 +163,416 @@ pub mod paths {
     use super::components::responses;
     pub mod oauth_authorize_request {
         use super::responses;
-        use actix_swagger::ContentType;
-        use actix_web::http::StatusCode;
-        use serde::Serialize;
-
-        pub type Answer = actix_swagger::Answer<'static, Response>;
+        use ::actix_swagger::ContentType;
+        use ::actix_web::http::StatusCode;
+        use ::serde::Serialize;
 
         #[derive(Debug, Serialize)]
         #[serde(untagged)]
-        pub enum Response {
-            Ok(responses::OAuthAuthorizeDone),
-            BadRequest(responses::OAuthAuthorizeRequestFailure),
-            InternalServerError
+        pub enum Response { 
+            Ok(responses::OAuthAuthorizeDone)
+        }
+        
+        impl ::actix_web::Responder for Response {
+            fn respond_to(self, _: &::actix_web::HttpRequest) -> ::actix_web::HttpResponse {
+                match self { 
+                    Response::Ok(body) => ::actix_web::HttpResponse::build(StatusCode::OK).json(body)
+                }
+            }
         }
 
-        impl Response {
-            #[inline]
-            pub fn answer<'a>(self) -> actix_swagger::Answer<'a, Self> {
-                let status = match self {
-                    Self::Ok(_) => StatusCode::OK,
+        #[derive(Debug, Serialize, ::thiserror::Error)]
+        pub enum Error {
+            BadRequest(#[source] responses::OAuthAuthorizeRequestFailure),
+            InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
+        }
+        
+        impl ::actix_web::ResponseError for Error {
+            fn status_code(&self) -> StatusCode {
+                match self { 
                     Self::BadRequest(_) => StatusCode::BAD_REQUEST,
                     Self::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
-                };
-
+                }
+            }
+            fn error_response(&self) -> ::actix_web::HttpResponse {
                 let content_type = match self {
-                    Self::Ok(_) => Some(ContentType::Json),
                     Self::BadRequest(_) => Some(ContentType::Json),
                     Self::InternalServerError => None
                 };
+                
+                let mut res = &mut ::actix_web::HttpResponse::build(self.status_code());
+                if let Some(content_type) = content_type {
+                    res = res.content_type(content_type.to_string());
 
-                actix_swagger::Answer::new(self)
-                    .status(status)
-                    .content_type(content_type)
+                    match content_type {
+                        ContentType::Json => res.json(self),
+                        ContentType::FormData => res.body(serde_plain::to_string(self).unwrap()),
+                    }
+                } else {
+                    ::actix_web::HttpResponse::InternalServerError().finish()
+                }
             }
         }
     }
 
     pub mod access_recovery_send_email {
         use super::responses;
-        use actix_swagger::ContentType;
-        use actix_web::http::StatusCode;
-        use serde::Serialize;
-
-        pub type Answer = actix_swagger::Answer<'static, Response>;
+        use ::actix_swagger::ContentType;
+        use ::actix_web::http::StatusCode;
+        use ::serde::Serialize;
 
         #[derive(Debug, Serialize)]
         #[serde(untagged)]
-        pub enum Response {
-            Ok,
-            BadRequest(responses::AccessRecoverySendEmailFailure),
-            InternalServerError
+        pub enum Response { 
+            Ok
+        }
+        
+        impl ::actix_web::Responder for Response {
+            fn respond_to(self, _: &::actix_web::HttpRequest) -> ::actix_web::HttpResponse {
+                match self { 
+                    Response::Ok => ::actix_web::HttpResponse::build(StatusCode::OK).finish()
+                }
+            }
         }
 
-        impl Response {
-            #[inline]
-            pub fn answer<'a>(self) -> actix_swagger::Answer<'a, Self> {
-                let status = match self {
-                    Self::Ok => StatusCode::OK,
+        #[derive(Debug, Serialize, ::thiserror::Error)]
+        pub enum Error {
+            BadRequest(#[source] responses::AccessRecoverySendEmailFailure),
+            InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
+        }
+        
+        impl ::actix_web::ResponseError for Error {
+            fn status_code(&self) -> StatusCode {
+                match self { 
                     Self::BadRequest(_) => StatusCode::BAD_REQUEST,
                     Self::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
-                };
-
+                }
+            }
+            fn error_response(&self) -> ::actix_web::HttpResponse {
                 let content_type = match self {
-                    Self::Ok => None,
                     Self::BadRequest(_) => Some(ContentType::Json),
                     Self::InternalServerError => None
                 };
+                
+                let mut res = &mut ::actix_web::HttpResponse::build(self.status_code());
+                if let Some(content_type) = content_type {
+                    res = res.content_type(content_type.to_string());
 
-                actix_swagger::Answer::new(self)
-                    .status(status)
-                    .content_type(content_type)
+                    match content_type {
+                        ContentType::Json => res.json(self),
+                        ContentType::FormData => res.body(serde_plain::to_string(self).unwrap()),
+                    }
+                } else {
+                    ::actix_web::HttpResponse::InternalServerError().finish()
+                }
             }
         }
     }
 
     pub mod access_recovery_set_password {
         use super::responses;
-        use actix_swagger::ContentType;
-        use actix_web::http::StatusCode;
-        use serde::Serialize;
-
-        pub type Answer = actix_swagger::Answer<'static, Response>;
+        use ::actix_swagger::ContentType;
+        use ::actix_web::http::StatusCode;
+        use ::serde::Serialize;
 
         #[derive(Debug, Serialize)]
         #[serde(untagged)]
-        pub enum Response {
-            Ok,
-            BadRequest(responses::AccessRecoverySetPasswordFailure),
-            InternalServerError
+        pub enum Response { 
+            Ok
+        }
+        
+        impl ::actix_web::Responder for Response {
+            fn respond_to(self, _: &::actix_web::HttpRequest) -> ::actix_web::HttpResponse {
+                match self { 
+                    Response::Ok => ::actix_web::HttpResponse::build(StatusCode::OK).finish()
+                }
+            }
         }
 
-        impl Response {
-            #[inline]
-            pub fn answer<'a>(self) -> actix_swagger::Answer<'a, Self> {
-                let status = match self {
-                    Self::Ok => StatusCode::OK,
+        #[derive(Debug, Serialize, ::thiserror::Error)]
+        pub enum Error {
+            BadRequest(#[source] responses::AccessRecoverySetPasswordFailure),
+            InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
+        }
+        
+        impl ::actix_web::ResponseError for Error {
+            fn status_code(&self) -> StatusCode {
+                match self { 
                     Self::BadRequest(_) => StatusCode::BAD_REQUEST,
                     Self::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
-                };
-
+                }
+            }
+            fn error_response(&self) -> ::actix_web::HttpResponse {
                 let content_type = match self {
-                    Self::Ok => None,
                     Self::BadRequest(_) => Some(ContentType::Json),
                     Self::InternalServerError => None
                 };
+                
+                let mut res = &mut ::actix_web::HttpResponse::build(self.status_code());
+                if let Some(content_type) = content_type {
+                    res = res.content_type(content_type.to_string());
 
-                actix_swagger::Answer::new(self)
-                    .status(status)
-                    .content_type(content_type)
+                    match content_type {
+                        ContentType::Json => res.json(self),
+                        ContentType::FormData => res.body(serde_plain::to_string(self).unwrap()),
+                    }
+                } else {
+                    ::actix_web::HttpResponse::InternalServerError().finish()
+                }
             }
         }
     }
 
     pub mod register_request {
         use super::responses;
-        use actix_swagger::ContentType;
-        use actix_web::http::StatusCode;
-        use serde::Serialize;
-
-        pub type Answer = actix_swagger::Answer<'static, Response>;
+        use ::actix_swagger::ContentType;
+        use ::actix_web::http::StatusCode;
+        use ::serde::Serialize;
 
         #[derive(Debug, Serialize)]
         #[serde(untagged)]
-        pub enum Response {
-            Created(responses::RegistrationRequestCreated),
-            BadRequest(responses::RegisterFailed),
-            InternalServerError
+        pub enum Response { 
+            Created(responses::RegistrationRequestCreated)
+        }
+        
+        impl ::actix_web::Responder for Response {
+            fn respond_to(self, _: &::actix_web::HttpRequest) -> ::actix_web::HttpResponse {
+                match self { 
+                    Response::Created(body) => ::actix_web::HttpResponse::build(StatusCode::CREATED).json(body)
+                }
+            }
         }
 
-        impl Response {
-            #[inline]
-            pub fn answer<'a>(self) -> actix_swagger::Answer<'a, Self> {
-                let status = match self {
-                    Self::Created(_) => StatusCode::CREATED,
+        #[derive(Debug, Serialize, ::thiserror::Error)]
+        pub enum Error {
+            BadRequest(#[source] responses::RegisterFailed),
+            InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
+        }
+        
+        impl ::actix_web::ResponseError for Error {
+            fn status_code(&self) -> StatusCode {
+                match self { 
                     Self::BadRequest(_) => StatusCode::BAD_REQUEST,
                     Self::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
-                };
-
+                }
+            }
+            fn error_response(&self) -> ::actix_web::HttpResponse {
                 let content_type = match self {
-                    Self::Created(_) => Some(ContentType::Json),
                     Self::BadRequest(_) => Some(ContentType::Json),
                     Self::InternalServerError => None
                 };
+                
+                let mut res = &mut ::actix_web::HttpResponse::build(self.status_code());
+                if let Some(content_type) = content_type {
+                    res = res.content_type(content_type.to_string());
 
-                actix_swagger::Answer::new(self)
-                    .status(status)
-                    .content_type(content_type)
+                    match content_type {
+                        ContentType::Json => res.json(self),
+                        ContentType::FormData => res.body(serde_plain::to_string(self).unwrap()),
+                    }
+                } else {
+                    ::actix_web::HttpResponse::InternalServerError().finish()
+                }
             }
         }
     }
 
     pub mod register_confirmation {
         use super::responses;
-        use actix_swagger::ContentType;
-        use actix_web::http::StatusCode;
-        use serde::Serialize;
-
-        pub type Answer = actix_swagger::Answer<'static, Response>;
+        use ::actix_swagger::ContentType;
+        use ::actix_web::http::StatusCode;
+        use ::serde::Serialize;
 
         #[derive(Debug, Serialize)]
         #[serde(untagged)]
-        pub enum Response {
-            Created,
-            BadRequest(responses::RegisterConfirmationFailed),
-            InternalServerError
+        pub enum Response { 
+            Created
+        }
+        
+        impl ::actix_web::Responder for Response {
+            fn respond_to(self, _: &::actix_web::HttpRequest) -> ::actix_web::HttpResponse {
+                match self { 
+                    Response::Created => ::actix_web::HttpResponse::build(StatusCode::CREATED).finish()
+                }
+            }
         }
 
-        impl Response {
-            #[inline]
-            pub fn answer<'a>(self) -> actix_swagger::Answer<'a, Self> {
-                let status = match self {
-                    Self::Created => StatusCode::CREATED,
+        #[derive(Debug, Serialize, ::thiserror::Error)]
+        pub enum Error {
+            BadRequest(#[source] responses::RegisterConfirmationFailed),
+            InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
+        }
+        
+        impl ::actix_web::ResponseError for Error {
+            fn status_code(&self) -> StatusCode {
+                match self { 
                     Self::BadRequest(_) => StatusCode::BAD_REQUEST,
                     Self::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
-                };
-
+                }
+            }
+            fn error_response(&self) -> ::actix_web::HttpResponse {
                 let content_type = match self {
-                    Self::Created => None,
                     Self::BadRequest(_) => Some(ContentType::Json),
                     Self::InternalServerError => None
                 };
+                
+                let mut res = &mut ::actix_web::HttpResponse::build(self.status_code());
+                if let Some(content_type) = content_type {
+                    res = res.content_type(content_type.to_string());
 
-                actix_swagger::Answer::new(self)
-                    .status(status)
-                    .content_type(content_type)
+                    match content_type {
+                        ContentType::Json => res.json(self),
+                        ContentType::FormData => res.body(serde_plain::to_string(self).unwrap()),
+                    }
+                } else {
+                    ::actix_web::HttpResponse::InternalServerError().finish()
+                }
             }
         }
     }
 
     pub mod session_create {
         use super::responses;
-        use actix_swagger::ContentType;
-        use actix_web::http::StatusCode;
-        use serde::Serialize;
-
-        pub type Answer = actix_swagger::Answer<'static, Response>;
+        use ::actix_swagger::ContentType;
+        use ::actix_web::http::StatusCode;
+        use ::serde::Serialize;
 
         #[derive(Debug, Serialize)]
         #[serde(untagged)]
-        pub enum Response {
-            Created(responses::SessionCreateSucceeded),
-            BadRequest(responses::SessionCreateFailed),
-            InternalServerError
+        pub enum Response { 
+            Created(responses::SessionCreateSucceeded)
+        }
+        
+        impl ::actix_web::Responder for Response {
+            fn respond_to(self, _: &::actix_web::HttpRequest) -> ::actix_web::HttpResponse {
+                match self { 
+                    Response::Created(body) => ::actix_web::HttpResponse::build(StatusCode::CREATED).json(body)
+                }
+            }
         }
 
-        impl Response {
-            #[inline]
-            pub fn answer<'a>(self) -> actix_swagger::Answer<'a, Self> {
-                let status = match self {
-                    Self::Created(_) => StatusCode::CREATED,
+        #[derive(Debug, Serialize, ::thiserror::Error)]
+        pub enum Error {
+            BadRequest(#[source] responses::SessionCreateFailed),
+            InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
+        }
+        
+        impl ::actix_web::ResponseError for Error {
+            fn status_code(&self) -> StatusCode {
+                match self { 
                     Self::BadRequest(_) => StatusCode::BAD_REQUEST,
                     Self::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
-                };
-
+                }
+            }
+            fn error_response(&self) -> ::actix_web::HttpResponse {
                 let content_type = match self {
-                    Self::Created(_) => Some(ContentType::Json),
                     Self::BadRequest(_) => Some(ContentType::Json),
                     Self::InternalServerError => None
                 };
+                
+                let mut res = &mut ::actix_web::HttpResponse::build(self.status_code());
+                if let Some(content_type) = content_type {
+                    res = res.content_type(content_type.to_string());
 
-                actix_swagger::Answer::new(self)
-                    .status(status)
-                    .content_type(content_type)
+                    match content_type {
+                        ContentType::Json => res.json(self),
+                        ContentType::FormData => res.body(serde_plain::to_string(self).unwrap()),
+                    }
+                } else {
+                    ::actix_web::HttpResponse::InternalServerError().finish()
+                }
             }
         }
     }
 
     pub mod session_get {
         use super::responses;
-        use actix_swagger::ContentType;
-        use actix_web::http::StatusCode;
-        use serde::Serialize;
-
-        pub type Answer = actix_swagger::Answer<'static, Response>;
+        use ::actix_swagger::ContentType;
+        use ::actix_web::http::StatusCode;
+        use ::serde::Serialize;
 
         #[derive(Debug, Serialize)]
         #[serde(untagged)]
-        pub enum Response {
-            Ok(responses::SessionGetSuccess),
-            Unauthorized,
-            InternalServerError
+        pub enum Response { 
+            Ok(responses::SessionGetSuccess)
+        }
+        
+        impl ::actix_web::Responder for Response {
+            fn respond_to(self, _: &::actix_web::HttpRequest) -> ::actix_web::HttpResponse {
+                match self { 
+                    Response::Ok(body) => ::actix_web::HttpResponse::build(StatusCode::OK).json(body)
+                }
+            }
         }
 
-        impl Response {
-            #[inline]
-            pub fn answer<'a>(self) -> actix_swagger::Answer<'a, Self> {
-                let status = match self {
-                    Self::Ok(_) => StatusCode::OK,
-                    Self::Unauthorized => StatusCode::UNAUTHORIZED,
+        #[derive(Debug, Serialize, ::thiserror::Error)]
+        pub enum Error {
+            InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
+        }
+        
+        impl ::actix_web::ResponseError for Error {
+            fn status_code(&self) -> StatusCode {
+                match self { 
                     Self::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
-                };
-
-                let content_type = match self {
-                    Self::Ok(_) => Some(ContentType::Json),
-                    Self::Unauthorized => None,
-                    Self::InternalServerError => None
-                };
-
-                actix_swagger::Answer::new(self)
-                    .status(status)
-                    .content_type(content_type)
+                }
             }
+            
         }
     }
 
     pub mod session_delete {
         use super::responses;
-        use actix_swagger::ContentType;
-        use actix_web::http::StatusCode;
-        use serde::Serialize;
-
-        pub type Answer = actix_swagger::Answer<'static, Response>;
+        use ::actix_swagger::ContentType;
+        use ::actix_web::http::StatusCode;
+        use ::serde::Serialize;
 
         #[derive(Debug, Serialize)]
         #[serde(untagged)]
-        pub enum Response {
-            Ok,
-            BadRequest(responses::SessionDeleteFailure),
-            Unauthorized,
-            InternalServerError
+        pub enum Response { 
+            Ok
+        }
+        
+        impl ::actix_web::Responder for Response {
+            fn respond_to(self, _: &::actix_web::HttpRequest) -> ::actix_web::HttpResponse {
+                match self { 
+                    Response::Ok => ::actix_web::HttpResponse::build(StatusCode::OK).finish()
+                }
+            }
         }
 
-        impl Response {
-            #[inline]
-            pub fn answer<'a>(self) -> actix_swagger::Answer<'a, Self> {
-                let status = match self {
-                    Self::Ok => StatusCode::OK,
+        #[derive(Debug, Serialize, ::thiserror::Error)]
+        pub enum Error {
+            BadRequest(#[source] responses::SessionDeleteFailure),
+            Unauthorized(#[source] #[serde(skip)] ::eyre::Report),
+            InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
+        }
+        
+        impl ::actix_web::ResponseError for Error {
+            fn status_code(&self) -> StatusCode {
+                match self { 
                     Self::BadRequest(_) => StatusCode::BAD_REQUEST,
                     Self::Unauthorized => StatusCode::UNAUTHORIZED,
                     Self::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
-                };
-
+                }
+            }
+            fn error_response(&self) -> ::actix_web::HttpResponse {
                 let content_type = match self {
-                    Self::Ok => None,
                     Self::BadRequest(_) => Some(ContentType::Json),
                     Self::Unauthorized => None,
                     Self::InternalServerError => None
                 };
+                
+                let mut res = &mut ::actix_web::HttpResponse::build(self.status_code());
+                if let Some(content_type) = content_type {
+                    res = res.content_type(content_type.to_string());
 
-                actix_swagger::Answer::new(self)
-                    .status(status)
-                    .content_type(content_type)
+                    match content_type {
+                        ContentType::Json => res.json(self),
+                        ContentType::FormData => res.body(serde_plain::to_string(self).unwrap()),
+                    }
+                } else {
+                    ::actix_web::HttpResponse::InternalServerError().finish()
+                }
             }
         }
     }
