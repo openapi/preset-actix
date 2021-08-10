@@ -2,32 +2,13 @@ import { FilesApi, Method, PresetConstructor, status } from 'openapi';
 import { OpenAPIV3 } from 'openapi-types';
 import * as changeCase from 'change-case';
 import * as template from './template';
+import { Components } from './components';
+import { createSchema, traverseSchema } from './schemas';
 
 const PACKAGE_NAME = 'openapi-preset-actix';
 
 interface Options {
   fileName?: string;
-}
-
-class Components {
-  private extras = new Set<string>();
-  private components = new Map<string, string>();
-
-  addExtra(extra: string) {
-    this.extras.add(extra);
-  }
-
-  addComponent(name: string, component: string) {
-    this.components.set(name, component);
-  }
-
-  hasItems() {
-    return this.components.size !== 0;
-  }
-
-  build(): string {
-    return [...this.extras, ...this.components.values()].join('');
-  }
 }
 
 const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, internal) => {
@@ -38,46 +19,6 @@ const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, 
     parameters.addExtra(template.HeaderExtractor);
     const struct = changeCase.pascalCase(name);
     parameters.addComponent(struct, template.headerStructure(struct, header));
-  }
-
-  function traverseSchema(name: string, schema: OpenAPIV3.SchemaObject): string {
-    schemas.addExtra(template.SchemasExtra);
-
-    if (isSchemaArray(schema)) {
-      schemas.addExtra(template.UseParentComponents);
-      const itemsType = internal.isRef(schema.items)
-        ? refToRust(schema.items.$ref)
-        : traverseSchema(`${name}_Item`, schema.items);
-
-      schemas.addComponent(name, template.vec(name, itemsType));
-    } else if (isSchemaNonArray(schema)) {
-      let component = '';
-
-      if (schema.type === 'string' && schema.enum) {
-        component = template.enumeration(
-          name,
-          new Set(schema.enum),
-          '#[derive(Debug, Serialize, Deserialize)]',
-        );
-      } else if (schema.type === 'object' && schema.properties) {
-        const fields = new Map<string, string>();
-        for (const [propName, type] of Object.entries(schema.properties)) {
-          const optional = schema.required?.includes(propName) ?? false;
-          const realType = internal.isRef(type)
-            ? (schemas.addExtra(template.UseParentComponents), refToRust(type.$ref))
-            : traverseSchema(`${name}_${propName}`, type);
-          const content = optional ? `Option<${realType}>` : realType;
-
-          fields.set(name, content);
-        }
-        component = template.struct(name, fields, template.DeriveSerde);
-      } else {
-        return template.typeToRust(schema.type ?? 'object');
-      }
-
-      schemas.addComponent(name, component);
-    }
-    return `components::schemas::${changeCase.pascalCase(name)}`;
   }
 
   const apiPaths = new Map<string, { api: string; path: string }>();
@@ -92,7 +33,7 @@ const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, 
     },
 
     onSchema(name: string, schema: OpenAPIV3.SchemaObject) {
-      traverseSchema(name, schema);
+      createSchema(schemas, internal).add(name, schema, true);
     },
 
     onOperation(pattern: string, method: Method, operation: OpenAPIV3.OperationObject) {
@@ -176,21 +117,3 @@ const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, 
 };
 
 module.exports = preset;
-
-function isSchemaArray(schema: OpenAPIV3.SchemaObject): schema is OpenAPIV3.ArraySchemaObject {
-  return schema.type === 'array' || (schema as any)['items'];
-}
-
-function isSchemaNonArray(
-  schema: OpenAPIV3.SchemaObject,
-): schema is OpenAPIV3.NonArraySchemaObject {
-  return schema.type !== 'array' || !schema['items'];
-}
-
-function refToRust(ref: string): string {
-  if (ref[0] !== '#') {
-    throw new TypeError('Non local references does not supported inside openapi');
-  }
-  const path = ref.replace('#', '').replace(/^\//, '').replace(/\//gi, '::');
-  return `${path}`;
-}

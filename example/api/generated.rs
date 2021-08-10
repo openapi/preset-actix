@@ -591,28 +591,38 @@ pub mod components {
 
     pub mod schemas {
         use serde::{Deserialize, Serialize};
-        use super as components;
 
-        pub type SessionUserList = std::vec::Vec<string>;
-
-        pub type SessionUserRefList = std::vec::Vec<components::schemas::SessionUser>;
-
+        pub type Demo = ::std::vec::Vec<components::schemas::SessionUser>;
+         
         #[derive(Debug, Serialize, Deserialize)]
-        pub enum SessionUserEnumeration {
+        pub enum AnotherEnum {
+            #[serde(rename = "first")]
             First,
+            #[serde(rename = "second")]
             Second,
-            #[serde(rename = "third")]
-            Third,
-            #[serde(rename = "the-latest")]
-            TheLatest,
+            #[serde(rename = "another_way")]
+            AnotherWay,
+            #[serde(rename = "do_you_really_need_IT")]
+            DoYouReallyNeedIt,
+            RandomThing,
         }
 
-        #[derive(Debug, Serialize, Deserialize)]
-        pub struct SessionUser {
-            #[serde(rename = "SessionUser")]
-            pub session_user: components::schemas::SessionUserEnumeration,
-        }
-
+        pub type Stringfy = ::std::string::String;
+         
+        pub type UidExampleYo = ::std::option::Option<::uuid::Uuid>;
+         
+        pub type NestIntoArray = ::std::vec::Vec<::std::option::Option<::uuid::Uuid>>;
+         
+        pub type NestedArraysItem = ::std::vec::Vec<::std::option::Option<::chrono::DateTime<::chrono::Utc>>>;
+         
+        pub type NestedArrays = ::std::vec::Vec<components::schemas::NestedArraysItem>;
+         
+        pub type Wonder = ::std::collections::HashMap<::std::string::String, ::serde_json::value::Value>;
+         
+        pub type DateIsIt = ::chrono::DateTime<::chrono::Utc>;
+         
+        pub type SessionUser = ::serde_json::value::Value;
+         
     }
 
 }

@@ -467,6 +467,54 @@ components:
                 type: boolean
 
   schemas:
+    Demo:
+      description: Example
+      type: array
+      items:
+        $ref: "#/components/schemas/SessionUser"
+
+    AnotherEnum:
+      description: Wow
+      type: string
+      enum:
+        - first
+        - second
+        - another_way
+        - do_you_really_need_IT
+        - RandomThing
+
+    Stringfy:
+      description: Demo
+      type: string
+    UID_EXAMPLE_YO:
+      description: Demo
+      nullable: true
+      type: string
+      format: uuid
+
+    NestIntoArray:
+      type: array
+      items:
+        type: string
+        nullable: true
+        format: uuid
+
+    NestedArrays:
+      type: array
+      items:
+        type: array
+        items:
+          type: string
+          nullable: true
+          format: date-time
+
+    Wonder:
+      type: object
+
+    DateIsIT:
+      type: string
+      format: date-time
+
     SessionUser:
       description: Current user in a session
       type: object

@@ -286,15 +286,62 @@ ${lines.map((i) => tabulate(i)).join('\n')}
 `;
 }
 
-export function vec(name: string, itemsType: string) {
-  const typeName = changeCase.pascalCase(name);
-  return `
-pub type ${typeName} = std::vec::Vec<${itemsType}>;
-`;
+export function vec(itemsType: string) {
+  return `::std::vec::Vec<${itemsType}>`;
 }
 
-export function typeToRust(type: string): string {
-  return type;
+export function pubType(name: string, contentType: string) {
+  const typeName = changeCase.pascalCase(name);
+  return `
+pub type ${typeName} = ${contentType};
+ `;
+}
+
+export function keyVal() {
+  return `::std::collections::HashMap<::std::string::String, ::serde_json::value::Value>`;
+}
+
+export function typeToRust(type: string, format?: string, nullable = false): string {
+  if (nullable) return `::std::option::Option<${typeToRust(type, format)}>`;
+
+  switch (type) {
+    case 'integer':
+      switch (format) {
+        case 'int32':
+          return 'i32';
+        case 'int64':
+          return 'i64';
+        default:
+          return 'i32';
+      }
+    case 'number':
+      switch (format) {
+        case 'float':
+          return 'f32';
+        case 'double':
+          return 'f64';
+        default:
+          return 'f32';
+      }
+    case 'string':
+      switch (format) {
+        case 'date':
+          return '::chrono::Date<::chrono::Utc>';
+        case 'date-time':
+          return '::chrono::DateTime<::chrono::Utc>';
+        case 'uuid':
+          return '::uuid::Uuid';
+        case 'byte':
+          return '::std::string::String';
+        case 'binary':
+          return '::std::vec::Vec<u8>';
+        default:
+          return '::std::string::String';
+      }
+    case 'boolean':
+      return 'bool';
+  }
+  return '::serde_json::value::Value';
 }
 
 function tabulate(content: string, count = 1, noFirst = false): string {
