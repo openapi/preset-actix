@@ -11,6 +11,9 @@ export function createSchema(schemas: Components, internal: Internal) {
       console.log(name, schema);
 
       if (isSchemaArray(schema)) {
+        if (internal.isRef(schema.items)) {
+          schemas.addExtra(template.UseParentComponents);
+        }
         const itemsType = internal.isRef(schema.items)
           ? refToRust(schema.items.$ref)
           : !schema.items.type || schema.items.type === 'object' || schema.items.type === 'array'
@@ -46,6 +49,21 @@ export function createSchema(schemas: Components, internal: Internal) {
       }
 
       if (isSchemaObject(schema)) {
+        const fields = new Map<string, { content: string; skipSerialize: boolean }>();
+        for (const [propName, type] of Object.entries(schema.properties ?? {})) {
+          const skipSerialize = schema.required?.includes(propName) ?? false;
+          // check for nullable?
+          if (internal.isRef(type)) {
+            schemas.addExtra(template.UseParentComponents);
+          }
+          const realType = internal.isRef(type)
+            ? refToRust(type.$ref)
+            : api.add(`${name}_${propName}`, type);
+          const content = skipSerialize ? `std::option::Option<${realType}>` : realType;
+          fields.set(propName, { content, skipSerialize });
+        }
+        schemas.addComponent(name, template.struct(name, fields, template.DeriveSerde));
+        return `components::schemas::${changeCase.pascalCase(name)}`;
       }
 
       if (named) {
@@ -91,7 +109,7 @@ export function traverseSchema(
         '#[derive(Debug, Serialize, Deserialize)]',
       );
     } else if (schema.type === 'object' && schema.properties) {
-      const fields = new Map<string, string>();
+      const fields = new Map<string, { content: string; skipSerialize: boolean }>();
       for (const [propName, type] of Object.entries(schema.properties)) {
         const optional = schema.required?.includes(propName) ?? false;
         const realType = internal.isRef(type)
@@ -99,7 +117,7 @@ export function traverseSchema(
           : traverseSchema(`${name}_${propName}`, type, schemas, internal);
         const content = optional ? `Option<${realType}>` : realType;
 
-        fields.set(name, content);
+        fields.set(name, { content, skipSerialize: optional });
       }
       component = template.struct(name, fields, template.DeriveSerde);
     } else {

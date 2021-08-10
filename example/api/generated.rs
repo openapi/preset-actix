@@ -591,6 +591,7 @@ pub mod components {
 
     pub mod schemas {
         use serde::{Deserialize, Serialize};
+        use super as components;
 
         pub type Demo = ::std::vec::Vec<components::schemas::SessionUser>;
          
@@ -598,13 +599,18 @@ pub mod components {
         pub enum AnotherEnum {
             #[serde(rename = "first")]
             First,
+
             #[serde(rename = "second")]
             Second,
+
             #[serde(rename = "another_way")]
             AnotherWay,
+
             #[serde(rename = "do_you_really_need_IT")]
             DoYouReallyNeedIt,
+
             RandomThing,
+
         }
 
         pub type Stringfy = ::std::string::String;
@@ -621,8 +627,43 @@ pub mod components {
          
         pub type DateIsIt = ::chrono::DateTime<::chrono::Utc>;
          
-        pub type SessionUser = ::serde_json::value::Value;
+        pub type SessionUserList = ::std::vec::Vec<::std::string::String>;
          
+        pub type SessionUserRefList = ::std::vec::Vec<components::schemas::SessionUser>;
+         
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum SessionUserEnumeration {
+            First,
+
+            Second,
+
+            #[serde(rename = "third")]
+            Third,
+
+            #[serde(rename = "the-latest")]
+            TheLatest,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct SessionUser {
+            #[serde(rename = "firstName")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub first_name: std::option::Option<::std::string::String>,
+
+            #[serde(rename = "lastName")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub last_name: std::option::Option<::std::string::String>,
+
+            pub list: components::schemas::SessionUserList,
+
+            #[serde(rename = "refList")]
+            pub ref_list: components::schemas::SessionUserRefList,
+
+            pub enumeration: components::schemas::SessionUserEnumeration,
+
+        }
+
     }
 
 }

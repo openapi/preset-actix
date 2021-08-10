@@ -248,15 +248,22 @@ export const DeriveSerde = `#[derive(Debug, Serialize, Deserialize)]`;
 export const UseParentComponents = `use super as components;
 `;
 
-export function struct(name: string, fields: Map<string, string>, derive = '') {
+export function struct(
+  name: string,
+  fields: Map<string, { content: string; skipSerialize: boolean }>,
+  derive = '',
+) {
   const structName = changeCase.pascalCase(name);
   const lines = [];
-  for (const [property, type] of fields.entries()) {
+  for (const [property, { content: type, skipSerialize }] of fields.entries()) {
     const snakeName = changeCase.snakeCase(property);
     if (snakeName !== property) {
       lines.push(`#[serde(rename = "${property}")]`);
     }
-    lines.push(`pub ${snakeName}: ${type},`);
+    if (skipSerialize) {
+      lines.push(`#[serde(skip_serializing_if = "::std::option::Option::is_none")]`);
+    }
+    lines.push(`pub ${snakeName}: ${type},\n`);
   }
   return `
 ${derive}
@@ -275,7 +282,7 @@ export function enumeration(name: string, variants: Set<string>, derive = ''): s
     if (pascalName !== variant) {
       lines.push(`#[serde(rename = "${variant}")]`);
     }
-    lines.push(`${pascalName},`);
+    lines.push(`${pascalName},\n`);
   }
 
   return `
