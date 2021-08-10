@@ -586,12 +586,114 @@ pub mod components {
     }
 
     pub mod request_bodies {
-
+        use super::schemas as schemas;
+        pub type OAuthAuthorize = ::actix_web::web::Json<schemas::OAuthAuthorizeRequestBody>;
+         
+        pub type Register = ::actix_web::web::Json<schemas::RegisterRequestBody>;
+         
+        pub type AccessRecoverySendEmail = ::actix_web::web::Json<schemas::AccessRecoverySendEmailRequestBody>;
+         
+        pub type AccessRecoverySetPassword = ::actix_web::web::Json<schemas::AccessRecoverySetPasswordRequestBody>;
+         
+        pub type RegisterConfirmation = ::actix_web::web::Json<schemas::RegisterConfirmationRequestBody>;
+         
+        pub type SessionCreate = ::actix_web::web::Json<schemas::SessionCreateRequestBody>;
+         
+        pub type SessionDelete = ::actix_web::web::Json<schemas::SessionDeleteRequestBody>;
+         
     }
 
     pub mod schemas {
         use serde::{Deserialize, Serialize};
         use super as components;
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum OAuthAuthorizeRequestBodyResponseType {
+            #[serde(rename = "code")]
+            Code,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct OAuthAuthorizeRequestBody {
+            #[serde(rename = "responseType")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub response_type: ::std::option::Option<components::schemas::OAuthAuthorizeRequestBodyResponseType>,
+
+            #[serde(rename = "clientId")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub client_id: ::std::option::Option<::uuid::Uuid>,
+
+            #[serde(rename = "redirectUri")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub redirect_uri: ::std::option::Option<::std::string::String>,
+
+            pub scope: ::std::string::String,
+
+            pub state: ::std::string::String,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct RegisterRequestBody {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub email: ::std::option::Option<::std::string::String>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct AccessRecoverySendEmailRequestBody {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub email: ::std::option::Option<::std::string::String>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct AccessRecoverySetPasswordRequestBody {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub password: ::std::option::Option<::std::string::String>,
+
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub code: ::std::option::Option<::std::string::String>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct RegisterConfirmationRequestBody {
+            #[serde(rename = "confirmationCode")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub confirmation_code: ::std::option::Option<::std::string::String>,
+
+            #[serde(rename = "firstName")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub first_name: ::std::option::Option<::std::string::String>,
+
+            #[serde(rename = "lastName")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub last_name: ::std::option::Option<::std::string::String>,
+
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub password: ::std::option::Option<::std::string::String>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct SessionCreateRequestBody {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub email: ::std::option::Option<::std::string::String>,
+
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub password: ::std::option::Option<::std::string::String>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct SessionDeleteRequestBody {
+            #[serde(rename = "deleteAllSessions")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub delete_all_sessions: ::std::option::Option<bool>,
+
+        }
 
         pub type Demo = ::std::vec::Vec<components::schemas::SessionUser>;
          
@@ -649,11 +751,11 @@ pub mod components {
         pub struct SessionUser {
             #[serde(rename = "firstName")]
             #[serde(skip_serializing_if = "::std::option::Option::is_none")]
-            pub first_name: std::option::Option<::std::string::String>,
+            pub first_name: ::std::option::Option<::std::string::String>,
 
             #[serde(rename = "lastName")]
             #[serde(skip_serializing_if = "::std::option::Option::is_none")]
-            pub last_name: std::option::Option<::std::string::String>,
+            pub last_name: ::std::option::Option<::std::string::String>,
 
             pub list: components::schemas::SessionUserList,
 

@@ -4,11 +4,31 @@ import { Internal } from 'openapi';
 import * as template from './template';
 import * as changeCase from 'change-case';
 
+export function createRequestBody(schemas: Components, bodies: Components, internal: Internal) {
+  const schemaApi = createSchema(schemas, internal);
+
+  return {
+    add(name: string, schema: OpenAPIV3.RequestBodyObject) {
+      const content = first(schema.content);
+      bodies.addExtra(`use super::schemas as schemas;`);
+
+      if (content.schema && !internal.isRef(content.schema)) {
+        schemaApi.add(`${name}RequestBody`, content.schema, true);
+        bodies.addComponent(
+          name,
+          template.pubType(name, template.webJson(`schemas::${name}RequestBody`)),
+        );
+      }
+
+      // TODO: add parsing request body from method definition
+    },
+  };
+}
+
 export function createSchema(schemas: Components, internal: Internal) {
   const api = {
-    add: (name: string, schema: OpenAPIV3.SchemaObject, named = false) => {
+    add(name: string, schema: OpenAPIV3.SchemaObject, named = false) {
       schemas.addExtra(template.SchemasExtra);
-      console.log(name, schema);
 
       if (isSchemaArray(schema)) {
         if (internal.isRef(schema.items)) {
@@ -59,7 +79,7 @@ export function createSchema(schemas: Components, internal: Internal) {
           const realType = internal.isRef(type)
             ? refToRust(type.$ref)
             : api.add(`${name}_${propName}`, type);
-          const content = skipSerialize ? `std::option::Option<${realType}>` : realType;
+          const content = skipSerialize ? `::std::option::Option<${realType}>` : realType;
           fields.set(propName, { content, skipSerialize });
         }
         schemas.addComponent(name, template.struct(name, fields, template.DeriveSerde));
@@ -157,4 +177,9 @@ function refToRust(ref: string): string {
   }
   const path = ref.replace('#', '').replace(/^\//, '').replace(/\//gi, '::');
   return `${path}`;
+}
+
+function first<T extends object>(source: T): T[keyof T] {
+  const key = Object.keys(source)[0] as keyof T;
+  return source[key];
 }

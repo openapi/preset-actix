@@ -3,17 +3,30 @@ import { OpenAPIV3 } from 'openapi-types';
 import * as changeCase from 'change-case';
 import * as template from './template';
 import { Components } from './components';
-import { createSchema, traverseSchema } from './schemas';
+import { createRequestBody, createSchema, traverseSchema } from './schemas';
 
 const PACKAGE_NAME = 'openapi-preset-actix';
 
 interface Options {
   fileName?: string;
+  frontmatter?: string | string[];
 }
 
-const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, internal) => {
+const preset: PresetConstructor<Options> = (
+  { fileName = 'generated.rs', frontmatter = '' } = {},
+  internal,
+) => {
   const parameters = new Components();
   const schemas = new Components();
+  const requestBodies = new Components();
+
+  if (frontmatter) {
+    if (Array.isArray(frontmatter)) {
+      frontmatter.forEach((line) => parameters.addExtra(line));
+    } else {
+      parameters.addExtra(frontmatter);
+    }
+  }
 
   function addHeader(name: string, header: string) {
     parameters.addExtra(template.HeaderExtractor);
@@ -34,6 +47,10 @@ const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, 
 
     onSchema(name: string, schema: OpenAPIV3.SchemaObject) {
       createSchema(schemas, internal).add(name, schema, true);
+    },
+
+    onRequestBody(name: string, requestBody: OpenAPIV3.RequestBodyObject) {
+      createRequestBody(schemas, requestBodies, internal).add(name, requestBody);
     },
 
     onOperation(pattern: string, method: Method, operation: OpenAPIV3.OperationObject) {
@@ -96,8 +113,8 @@ const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, 
         components.add(template.mod('responses', [].join('')));
       }
 
-      if (true) {
-        components.add(template.mod('request_bodies', [].join('')));
+      if (requestBodies.hasItems()) {
+        components.add(template.mod('request_bodies', requestBodies.build()));
       }
 
       if (schemas.hasItems()) {

@@ -304,6 +304,10 @@ pub type ${typeName} = ${contentType};
  `;
 }
 
+export function webJson(path: string) {
+  return `::actix_web::web::Json<${path}>`;
+}
+
 export function keyVal() {
   return `::std::collections::HashMap<::std::string::String, ::serde_json::value::Value>`;
 }
