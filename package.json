@@ -4,7 +4,7 @@
   "description": "Generate types for Rust Actix Web",
   "main": "dist/index.js",
   "scripts": {
-    "test": "jest --passWithNoTests",
+    "test": "yarn jest --passWithNoTests",
     "prepublishOnly": "yarn build",
     "build": "babel -d ./dist --extensions '.ts' ./src",
     "example": "yarn build && openapi --config ./example/.openapi.config.js"
@@ -35,6 +35,7 @@
     "@babel/preset-env": "^7.13.5",
     "@babel/preset-typescript": "^7.13.0",
     "@types/jest": "^26.0.20",
+    "jest": "^27.0.6",
     "openapi": "^2.0.0-13",
     "openapi-types": "^7.2.3",
     "prettier": "^2.2.1",
