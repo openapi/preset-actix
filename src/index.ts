@@ -1,21 +1,7 @@
 import { FilesApi, Method, PresetConstructor, status } from 'openapi';
 import { OpenAPIV3 } from 'openapi-types';
 import * as changeCase from 'change-case';
-import {
-  DeriveSerde,
-  HeaderExtractor,
-  SchemasExtra,
-  UseParentComponents,
-  apiStruct,
-  enumeration,
-  headerStructure,
-  mod,
-  pathBind,
-  pathModule,
-  struct,
-  typeToRust,
-  vec,
-} from './template';
+import * as template from './template';
 
 const PACKAGE_NAME = 'openapi-preset-actix';
 
@@ -49,26 +35,26 @@ const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, 
   const schemas = new Components();
 
   function addHeader(name: string, header: string) {
-    parameters.addExtra(HeaderExtractor);
+    parameters.addExtra(template.HeaderExtractor);
     const struct = changeCase.pascalCase(name);
-    parameters.addComponent(struct, headerStructure(struct, header));
+    parameters.addComponent(struct, template.headerStructure(struct, header));
   }
 
   function traverseSchema(name: string, schema: OpenAPIV3.SchemaObject): string {
-    schemas.addExtra(SchemasExtra);
+    schemas.addExtra(template.SchemasExtra);
 
     if (isSchemaArray(schema)) {
-      schemas.addExtra(UseParentComponents);
+      schemas.addExtra(template.UseParentComponents);
       const itemsType = internal.isRef(schema.items)
         ? refToRust(schema.items.$ref)
         : traverseSchema(`${name}_Item`, schema.items);
 
-      schemas.addComponent(name, vec(name, itemsType));
+      schemas.addComponent(name, template.vec(name, itemsType));
     } else if (isSchemaNonArray(schema)) {
       let component = '';
 
       if (schema.type === 'string' && schema.enum) {
-        component = enumeration(
+        component = template.enumeration(
           name,
           new Set(schema.enum),
           '#[derive(Debug, Serialize, Deserialize)]',
@@ -78,15 +64,15 @@ const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, 
         for (const [propName, type] of Object.entries(schema.properties)) {
           const optional = schema.required?.includes(propName) ?? false;
           const realType = internal.isRef(type)
-            ? (schemas.addExtra(UseParentComponents), refToRust(type.$ref))
+            ? (schemas.addExtra(template.UseParentComponents), refToRust(type.$ref))
             : traverseSchema(`${name}_${propName}`, type);
           const content = optional ? `Option<${realType}>` : realType;
 
           fields.set(name, content);
         }
-        component = struct(name, fields, DeriveSerde);
+        component = template.struct(name, fields, template.DeriveSerde);
       } else {
-        return typeToRust(schema.type ?? 'object');
+        return template.typeToRust(schema.type ?? 'object');
       }
 
       schemas.addComponent(name, component);
@@ -129,8 +115,8 @@ const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, 
       });
 
       apiPaths.set(moduleName, {
-        api: pathBind(operationId, pattern, method),
-        path: pathModule(operationId, responses),
+        api: template.pathBind(operationId, pattern, method),
+        path: template.pathModule(operationId, responses),
       });
     },
 
@@ -138,9 +124,9 @@ const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, 
       const chunks = [];
 
       chunks.push(
-        mod(
+        template.mod(
           'api',
-          apiStruct(
+          template.apiStruct(
             internal.root().info.title,
             Array.from(apiPaths.values())
               .map((a) => a.api)
@@ -150,7 +136,7 @@ const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, 
       );
 
       chunks.push(
-        mod(
+        template.mod(
           'paths',
           'use super::components::responses;' +
             Array.from(apiPaths.values())
@@ -162,23 +148,23 @@ const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, 
       const components = new Set<string>();
 
       if (parameters.hasItems()) {
-        components.add(mod('parameters', parameters.build()));
+        components.add(template.mod('parameters', parameters.build()));
       }
 
       if (true) {
-        components.add(mod('responses', [].join('')));
+        components.add(template.mod('responses', [].join('')));
       }
 
       if (true) {
-        components.add(mod('request_bodies', [].join('')));
+        components.add(template.mod('request_bodies', [].join('')));
       }
 
       if (schemas.hasItems()) {
-        components.add(mod('schemas', schemas.build()));
+        components.add(template.mod('schemas', schemas.build()));
       }
 
       if (components.size) {
-        chunks.push(mod('components', Array.from(components).join('')));
+        chunks.push(template.mod('components', Array.from(components).join('')));
       }
 
       files.addFile(

@@ -5,6 +5,7 @@
     "target": "ES2016",
     "lib": ["ESNext"],
     "downlevelIteration": true,
-    "moduleResolution": "Node"
+    "moduleResolution": "Node",
+    "noImplicitAny": true
   }
 }
