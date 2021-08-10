@@ -1,4 +1,4 @@
-import { PresetConstructor, status } from 'openapi';
+import { FilesApi, Method, PresetConstructor, status } from 'openapi';
 import { OpenAPIV3 } from 'openapi-types';
 import * as changeCase from 'change-case';
 
@@ -47,7 +47,7 @@ const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, 
         : traverseSchema(`${name}_Item`, schema.items);
 
       schemas.addComponent(name, vec(name, itemsType));
-    } else {
+    } else if (isSchemaNonArray(schema)) {
       let component = '';
 
       if (schema.type === 'string' && schema.enum) {
@@ -69,7 +69,7 @@ const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, 
         }
         component = struct(name, fields, DeriveSerde);
       } else {
-        return typeToRust(schema.type);
+        return typeToRust(schema.type ?? 'object');
       }
 
       schemas.addComponent(name, component);
@@ -80,43 +80,44 @@ const preset: PresetConstructor<Options> = ({ fileName = 'generated.rs' } = {}, 
   const apiPaths = new Map<string, { api: string; path: string }>();
 
   return {
-    name: 'actix-openapi-preset',
+    name: 'openapi-preset-actix',
 
-    onParameter(name, parameter) {
+    onParameter(name: string, parameter: OpenAPIV3.ParameterObject) {
       if (parameter.in === 'header') {
         addHeader(name, parameter.name);
       }
     },
 
-    onSchema(name, schema) {
+    onSchema(name: string, schema: OpenAPIV3.SchemaObject) {
       traverseSchema(name, schema);
     },
 
-    onOperation(pattern, method, operation) {
-      const moduleName = changeCase.snakeCase(operation.operationId);
+    onOperation(pattern: string, method: Method, operation: OpenAPIV3.OperationObject) {
+      const operationId = operation.operationId ?? pattern;
+      const moduleName = changeCase.snakeCase(operationId);
+
+      const responses = Object.entries(operation.responses ?? {}).map(([code, refOrResponse]) => {
+        const response = internal.isRef(refOrResponse)
+          ? (internal.resolveRef(refOrResponse.$ref) as OpenAPIV3.ResponseObject)
+          : refOrResponse;
+
+        const name = internal.isRef(refOrResponse)
+          ? refOrResponse.$ref.split('/').pop()!
+          : `${changeCase.pascalCase(operationId)}${changeCase.pascalCase(
+              status[Number(code) as keyof typeof status]?.code ?? code,
+            )}`;
+        const contentType = response.content?.['application/json'] ? 'json' : undefined;
+
+        return { code: parseInt(code, 10), contentType, name };
+      });
+
       apiPaths.set(moduleName, {
-        api: pathBind(operation.operationId, pattern, method),
-        path: pathModule(
-          operation.operationId,
-          Object.entries(operation.responses).map(([code, refOrResponse]) => {
-            const response = internal.isRef(refOrResponse)
-              ? (internal.resolveRef(refOrResponse.$ref) as OpenAPIV3.ResponseObject)
-              : refOrResponse;
-
-            const name = internal.isRef(refOrResponse)
-              ? refOrResponse.$ref.split('/').pop()
-              : `${changeCase.pascalCase(operation.operationId)}${changeCase.pascalCase(
-                  status[code]?.code ?? code,
-                )}`;
-            const contentType = response.content?.['application/json'] ? 'json' : undefined;
-
-            return { code: parseInt(code, 10), contentType, name };
-          }),
-        ),
+        api: pathBind(operationId, pattern, method),
+        path: pathModule(operationId, responses),
       });
     },
 
-    build(files) {
+    build(files: FilesApi) {
       const chunks = [];
 
       chunks.push(
@@ -261,9 +262,9 @@ function pathModule(
   const moduleName = changeCase.snakeCase(operationId);
 
   const variants = Object.values(responses)
-    .filter((variant) => status[variant.code])
+    .filter((variant) => (status as any)[variant.code])
     .map(({ code, contentType, name }) => {
-      const { label, code: upper } = status[code];
+      const { label, code: upper } = (status as any)[code];
       return { upper, label, code, contentType, name };
     });
 
@@ -407,7 +408,13 @@ function tabulate(content: string, count = 1): string {
 module.exports = preset;
 
 function isSchemaArray(schema: OpenAPIV3.SchemaObject): schema is OpenAPIV3.ArraySchemaObject {
-  return schema.type === 'array' || schema['items'];
+  return schema.type === 'array' || (schema as any)['items'];
+}
+
+function isSchemaNonArray(
+  schema: OpenAPIV3.SchemaObject,
+): schema is OpenAPIV3.NonArraySchemaObject {
+  return schema.type !== 'array' || !schema['items'];
 }
 
 function refToRust(ref: string): string {

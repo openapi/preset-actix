@@ -1,5 +1,5 @@
 {
-  "name": "actix-openapi-preset",
+  "name": "openapi-preset-actix",
   "version": "0.1.0",
   "description": "Generate types for Rust Actix Web",
   "main": "dist/index.js",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/openapi/actix-preset.git"
+    "url": "git+https://github.com/openapi/preset-actix.git"
   },
   "keywords": [
     "openapi",
@@ -26,9 +26,9 @@
   "author": "Sergey Sova <mail@sergeysova.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/openapi/actix-preset/issues"
+    "url": "https://github.com/openapi/preset-actix/issues"
   },
-  "homepage": "https://github.com/openapi/actix-preset#readme",
+  "homepage": "https://github.com/openapi/preset-actix#readme",
   "devDependencies": {
     "@babel/cli": "^7.13.0",
     "@babel/core": "^7.13.1",
@@ -38,7 +38,7 @@
     "openapi": "^2.0.0-13",
     "openapi-types": "^7.2.3",
     "prettier": "^2.2.1",
-    "typescript": "^4.2.2"
+    "typescript": "^4.3.5"
   },
   "dependencies": {
     "change-case": "^4.1.2"

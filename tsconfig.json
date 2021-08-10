@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "target": "ES2016",
+    "lib": ["ESNext"],
+    "downlevelIteration": true,
+    "moduleResolution": "Node"
+  }
+}
