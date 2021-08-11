@@ -1,20 +1,29 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { Components } from './components';
-import { Internal } from 'openapi';
+import { Internal, Method, status } from 'openapi';
 import * as template from './template';
 import * as changeCase from 'change-case';
 
-export function createRequestBody(schemas: Components, bodies: Components, internal: Internal) {
-  const schemaApi = createSchema(schemas, internal);
+interface Context {
+  schemas: Components;
+  responses: Components;
+  requestBodies: Components;
+  binders: Components;
+  paths: Components;
+  internal: Internal;
+}
+
+export function createRequestBody(ctx: Context) {
+  const schemaApi = createSchema(ctx);
 
   return {
     add(name: string, schema: OpenAPIV3.RequestBodyObject) {
       const content = first(schema.content);
-      bodies.addExtra(`use super::schemas;`);
+      ctx.requestBodies.addExtra(`use super::schemas;`);
 
-      if (content.schema && !internal.isRef(content.schema)) {
+      if (content.schema && !ctx.internal.isRef(content.schema)) {
         schemaApi.add(`${name}RequestBody`, content.schema, true);
-        bodies.addComponent(
+        ctx.requestBodies.addComponent(
           name,
           template.pubType(name, template.webJson(`schemas::${name}RequestBody`)),
         );
@@ -25,18 +34,18 @@ export function createRequestBody(schemas: Components, bodies: Components, inter
   };
 }
 
-export function createResponse(schemas: Components, responses: Components, internal: Internal) {
-  const schemaApi = createSchema(schemas, internal);
+export function createResponse(ctx: Context) {
+  const schemaApi = createSchema(ctx);
 
   return {
     add(name: string, schema: OpenAPIV3.ResponseObject) {
       if (!schema.content) return;
       const content = first(schema.content);
-      responses.addExtra(`use super::schemas;`);
+      ctx.responses.addExtra(`use super::schemas;`);
 
-      if (content.schema && !internal.isRef(content.schema)) {
+      if (content.schema && !ctx.internal.isRef(content.schema)) {
         schemaApi.add(`${name}Response`, content.schema, true);
-        responses.addComponent(name, template.pubType(name, `schemas::${name}Response`));
+        ctx.responses.addComponent(name, template.pubType(name, `schemas::${name}Response`));
       }
 
       // TODO: add parsing response from method definition
@@ -44,16 +53,47 @@ export function createResponse(schemas: Components, responses: Components, inter
   };
 }
 
-export function createSchema(schemas: Components, internal: Internal) {
+export function createOperation(ctx: Context) {
+  const requestBodyApi = createRequestBody(ctx);
+  const schemaApi = createSchema(ctx);
+  const responseApi = createResponse(ctx);
+
+  return {
+    add(pattern: string, method: Method, operation: OpenAPIV3.OperationObject) {
+      const operationId = operation.operationId ?? pattern;
+      const moduleName = changeCase.snakeCase(operationId);
+
+      const responses = Object.entries(operation.responses ?? {}).map(([code, refOrResponse]) => {
+        const response = ctx.internal.isRef(refOrResponse)
+          ? (ctx.internal.resolveRef(refOrResponse.$ref) as OpenAPIV3.ResponseObject)
+          : refOrResponse;
+
+        const humanReadableStatus = status[Number(code) as keyof typeof status]?.code ?? code;
+        const name = ctx.internal.isRef(refOrResponse)
+          ? refOrResponse.$ref.split('/').pop()!
+          : `${changeCase.pascalCase(operationId)}${changeCase.pascalCase(humanReadableStatus)}`;
+
+        const contentType = response.content?.['application/json'] ? 'json' : undefined;
+
+        return { code: parseInt(code, 10), contentType, name };
+      });
+
+      ctx.paths.addComponent(operationId, template.pathModule(operationId, responses));
+      ctx.binders.addComponent(operationId, template.pathBind(operationId, pattern, method));
+    },
+  };
+}
+
+export function createSchema(ctx: Context) {
   const api = {
-    add(name: string, schema: OpenAPIV3.SchemaObject, named = false) {
-      schemas.addExtra(template.SchemasExtra);
+    add(name: string, schema: OpenAPIV3.SchemaObject, named = false, derive: string | null = null) {
+      ctx.schemas.addExtra(template.SchemasExtra);
 
       if (isSchemaArray(schema)) {
-        if (internal.isRef(schema.items)) {
-          schemas.addExtra(template.UseParentComponents);
+        if (ctx.internal.isRef(schema.items)) {
+          ctx.schemas.addExtra(template.UseParentComponents);
         }
-        const itemsType = internal.isRef(schema.items)
+        const itemsType = ctx.internal.isRef(schema.items)
           ? refToRust(schema.items.$ref)
           : !schema.items.type || schema.items.type === 'object' || schema.items.type === 'array'
           ? api.add(`${name}_Item`, schema.items, true)
@@ -63,12 +103,12 @@ export function createSchema(schemas: Components, internal: Internal) {
               schema.items.nullable,
             );
 
-        schemas.addComponent(name, template.pubType(name, template.vec(itemsType)));
+        ctx.schemas.addComponent(name, template.pubType(name, template.vec(itemsType)));
         return `components::schemas::${changeCase.pascalCase(name)}`;
       }
 
       if (isSchemaEnum(schema)) {
-        schemas.addComponent(
+        ctx.schemas.addComponent(
           name,
           template.enumeration(
             name,
@@ -81,7 +121,7 @@ export function createSchema(schemas: Components, internal: Internal) {
 
       if (isSchemaFreeKeyVal(schema)) {
         if (named) {
-          schemas.addComponent(name, template.pubType(name, template.keyVal()));
+          ctx.schemas.addComponent(name, template.pubType(name, template.keyVal()));
           return `components::schemas::${changeCase.pascalCase(name)}`;
         }
         return template.keyVal();
@@ -92,21 +132,21 @@ export function createSchema(schemas: Components, internal: Internal) {
         for (const [propName, type] of Object.entries(schema.properties ?? {})) {
           const skipSerialize = schema.required?.includes(propName) ?? false;
           // check for nullable?
-          if (internal.isRef(type)) {
-            schemas.addExtra(template.UseParentComponents);
+          if (ctx.internal.isRef(type)) {
+            ctx.schemas.addExtra(template.UseParentComponents);
           }
-          const realType = internal.isRef(type)
+          const realType = ctx.internal.isRef(type)
             ? refToRust(type.$ref)
             : api.add(`${name}_${propName}`, type);
           const content = skipSerialize ? `::std::option::Option<${realType}>` : realType;
           fields.set(propName, { content, skipSerialize });
         }
-        schemas.addComponent(name, template.struct(name, fields, template.DeriveSerde));
+        ctx.schemas.addComponent(name, template.struct(name, fields, template.DeriveSerde));
         return `components::schemas::${changeCase.pascalCase(name)}`;
       }
 
       if (named) {
-        schemas.addComponent(
+        ctx.schemas.addComponent(
           name,
           template.pubType(
             name,
@@ -123,59 +163,8 @@ export function createSchema(schemas: Components, internal: Internal) {
   return api;
 }
 
-export function traverseSchema(
-  name: string,
-  schema: OpenAPIV3.SchemaObject,
-  schemas: Components,
-  internal: Internal,
-): string {
-  schemas.addExtra(template.SchemasExtra);
-
-  if (isSchemaArray(schema)) {
-    schemas.addExtra(template.UseParentComponents);
-    const itemsType = internal.isRef(schema.items)
-      ? refToRust(schema.items.$ref)
-      : traverseSchema(`${name}_Item`, schema.items, schemas, internal);
-
-    schemas.addComponent(name, template.pubType(name, template.vec(itemsType)));
-  } else if (isSchemaNonArray(schema)) {
-    let component = '';
-
-    if (schema.type === 'string' && schema.enum) {
-      component = template.enumeration(
-        name,
-        new Set(schema.enum),
-        '#[derive(Debug, Serialize, Deserialize)]',
-      );
-    } else if (schema.type === 'object' && schema.properties) {
-      const fields = new Map<string, { content: string; skipSerialize: boolean }>();
-      for (const [propName, type] of Object.entries(schema.properties)) {
-        const optional = schema.required?.includes(propName) ?? false;
-        const realType = internal.isRef(type)
-          ? (schemas.addExtra(template.UseParentComponents), refToRust(type.$ref))
-          : traverseSchema(`${name}_${propName}`, type, schemas, internal);
-        const content = optional ? `Option<${realType}>` : realType;
-
-        fields.set(name, { content, skipSerialize: optional });
-      }
-      component = template.struct(name, fields, template.DeriveSerde);
-    } else {
-      return template.typeToRust(schema.type ?? 'object');
-    }
-
-    schemas.addComponent(name, component);
-  }
-  return `components::schemas::${changeCase.pascalCase(name)}`;
-}
-
 function isSchemaArray(schema: OpenAPIV3.SchemaObject): schema is OpenAPIV3.ArraySchemaObject {
   return schema.type === 'array' || (schema as any)['items'];
-}
-
-function isSchemaNonArray(
-  schema: OpenAPIV3.SchemaObject,
-): schema is OpenAPIV3.NonArraySchemaObject {
-  return schema.type !== 'array' || !schema['items'];
 }
 
 function isSchemaEnum(schema: OpenAPIV3.SchemaObject) {
