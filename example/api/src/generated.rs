@@ -183,7 +183,7 @@ pub mod paths {
         #[derive(Debug, ::serde::Serialize, ::thiserror::Error)]
         #[serde(untagged)]
         pub enum Error {
-            #[error(transparent)]
+            #[error("O auth authorize request failure")]
             BadRequest(#[source] responses::OAuthAuthorizeRequestFailure),
             #[error(transparent)]
             InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
@@ -239,7 +239,7 @@ pub mod paths {
         #[derive(Debug, ::serde::Serialize, ::thiserror::Error)]
         #[serde(untagged)]
         pub enum Error {
-            #[error(transparent)]
+            #[error("Access recovery send email failure")]
             BadRequest(#[source] responses::AccessRecoverySendEmailFailure),
             #[error(transparent)]
             InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
@@ -295,7 +295,7 @@ pub mod paths {
         #[derive(Debug, ::serde::Serialize, ::thiserror::Error)]
         #[serde(untagged)]
         pub enum Error {
-            #[error(transparent)]
+            #[error("Access recovery set password failure")]
             BadRequest(#[source] responses::AccessRecoverySetPasswordFailure),
             #[error(transparent)]
             InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
@@ -351,7 +351,7 @@ pub mod paths {
         #[derive(Debug, ::serde::Serialize, ::thiserror::Error)]
         #[serde(untagged)]
         pub enum Error {
-            #[error(transparent)]
+            #[error("Register failed")]
             BadRequest(#[source] responses::RegisterFailed),
             #[error(transparent)]
             InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
@@ -407,7 +407,7 @@ pub mod paths {
         #[derive(Debug, ::serde::Serialize, ::thiserror::Error)]
         #[serde(untagged)]
         pub enum Error {
-            #[error(transparent)]
+            #[error("Register confirmation failed")]
             BadRequest(#[source] responses::RegisterConfirmationFailed),
             #[error(transparent)]
             InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
@@ -463,7 +463,7 @@ pub mod paths {
         #[derive(Debug, ::serde::Serialize, ::thiserror::Error)]
         #[serde(untagged)]
         pub enum Error {
-            #[error(transparent)]
+            #[error("Session create failed")]
             BadRequest(#[source] responses::SessionCreateFailed),
             #[error(transparent)]
             InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
@@ -555,7 +555,7 @@ pub mod paths {
         #[derive(Debug, ::serde::Serialize, ::thiserror::Error)]
         #[serde(untagged)]
         pub enum Error {
-            #[error(transparent)]
+            #[error("Session delete failure")]
             BadRequest(#[source] responses::SessionDeleteFailure),
             #[error("Session delete unauthorized")]
             Unauthorized(#[source] #[serde(skip)] ::eyre::Report),

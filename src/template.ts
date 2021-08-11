@@ -138,7 +138,7 @@ export function pathModule(
       const content = variant.contentType
         ? `responses::${variant.name}`
         : `#[serde(skip)] ::eyre::Report`;
-      const isTransparent = variant.contentType || variant.code === 500;
+      const isTransparent = /*variant.contentType || */ variant.code === 500;
       const errorDerive = isTransparent
         ? `#[error(transparent)]\n`
         : `#[error("${changeCase.sentenceCase(variant.name)}")]\n`;
