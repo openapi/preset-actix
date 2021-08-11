@@ -9,6 +9,9 @@
     "build": "babel -d ./dist --extensions '.ts' ./src",
     "example": "yarn build && openapi --config ./example/.openapi.config.js"
   },
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/openapi/preset-actix.git"
