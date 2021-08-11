@@ -598,11 +598,33 @@ pub mod paths {
 pub mod components {
 
     pub mod responses {
-
+        use super::schemas;
+        pub type OAuthAuthorizeDone = schemas::OAuthAuthorizeDoneResponse;
+         
+        pub type OAuthAuthorizeRequestFailure = schemas::OAuthAuthorizeRequestFailureResponse;
+         
+        pub type RegistrationRequestCreated = schemas::RegistrationRequestCreatedResponse;
+         
+        pub type RegisterFailed = schemas::RegisterFailedResponse;
+         
+        pub type RegisterConfirmationFailed = schemas::RegisterConfirmationFailedResponse;
+         
+        pub type AccessRecoverySetPasswordFailure = schemas::AccessRecoverySetPasswordFailureResponse;
+         
+        pub type AccessRecoverySendEmailFailure = schemas::AccessRecoverySendEmailFailureResponse;
+         
+        pub type SessionCreateSucceeded = schemas::SessionCreateSucceededResponse;
+         
+        pub type SessionCreateFailed = schemas::SessionCreateFailedResponse;
+         
+        pub type SessionGetSuccess = schemas::SessionGetSuccessResponse;
+         
+        pub type SessionDeleteFailure = schemas::SessionDeleteFailureResponse;
+         
     }
 
     pub mod request_bodies {
-        use super::schemas as schemas;
+        use super::schemas;
         pub type OAuthAuthorize = ::actix_web::web::Json<schemas::OAuthAuthorizeRequestBody>;
          
         pub type Register = ::actix_web::web::Json<schemas::RegisterRequestBody>;
@@ -708,6 +730,200 @@ pub mod components {
             #[serde(rename = "deleteAllSessions")]
             #[serde(skip_serializing_if = "::std::option::Option::is_none")]
             pub delete_all_sessions: ::std::option::Option<bool>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct OAuthAuthorizeDoneResponse {
+            #[serde(rename = "redirectUri")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub redirect_uri: ::std::option::Option<::std::string::String>,
+
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub code: ::std::option::Option<::std::string::String>,
+
+            pub state: ::std::string::String,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum OAuthAuthorizeRequestFailureResponseError {
+            #[serde(rename = "access_denied")]
+            AccessDenied,
+
+            #[serde(rename = "invalid_request")]
+            InvalidRequest,
+
+            #[serde(rename = "invalid_scope")]
+            InvalidScope,
+
+            #[serde(rename = "server_error")]
+            ServerError,
+
+            #[serde(rename = "temporarily_unavailable")]
+            TemporarilyUnavailable,
+
+            #[serde(rename = "unauthenticated_user")]
+            UnauthenticatedUser,
+
+            #[serde(rename = "unauthorized_client")]
+            UnauthorizedClient,
+
+            #[serde(rename = "unsupported_response_type")]
+            UnsupportedResponseType,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct OAuthAuthorizeRequestFailureResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub error: ::std::option::Option<components::schemas::OAuthAuthorizeRequestFailureResponseError>,
+
+            #[serde(rename = "redirectUri")]
+            pub redirect_uri: ::std::string::String,
+
+            pub state: ::std::string::String,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct RegistrationRequestCreatedResponse {
+            #[serde(rename = "expiresAt")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub expires_at: ::std::option::Option<i32>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum RegisterFailedResponseError {
+            #[serde(rename = "email_already_registered")]
+            EmailAlreadyRegistered,
+
+            #[serde(rename = "invalid_form")]
+            InvalidForm,
+
+            #[serde(rename = "invalid_payload")]
+            InvalidPayload,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct RegisterFailedResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub error: ::std::option::Option<components::schemas::RegisterFailedResponseError>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum RegisterConfirmationFailedResponseError {
+            #[serde(rename = "code_invalid_or_expired")]
+            CodeInvalidOrExpired,
+
+            #[serde(rename = "email_already_activated")]
+            EmailAlreadyActivated,
+
+            #[serde(rename = "invalid_form")]
+            InvalidForm,
+
+            #[serde(rename = "invalid_payload")]
+            InvalidPayload,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct RegisterConfirmationFailedResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub error: ::std::option::Option<components::schemas::RegisterConfirmationFailedResponseError>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum AccessRecoverySetPasswordFailureResponseError {
+            #[serde(rename = "invalid_code")]
+            InvalidCode,
+
+            #[serde(rename = "password_is_too_short")]
+            PasswordIsTooShort,
+
+            #[serde(rename = "password_is_too_weak")]
+            PasswordIsTooWeak,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct AccessRecoverySetPasswordFailureResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub error: ::std::option::Option<components::schemas::AccessRecoverySetPasswordFailureResponseError>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum AccessRecoverySendEmailFailureResponseError {
+            #[serde(rename = "invalid_email")]
+            InvalidEmail,
+
+            #[serde(rename = "invalid_password")]
+            InvalidPassword,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct AccessRecoverySendEmailFailureResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub error: ::std::option::Option<components::schemas::AccessRecoverySendEmailFailureResponseError>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct SessionCreateSucceededResponse {
+            #[serde(rename = "firstName")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub first_name: ::std::option::Option<::std::string::String>,
+
+            #[serde(rename = "lastName")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub last_name: ::std::option::Option<::std::string::String>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum SessionCreateFailedResponseError {
+            #[serde(rename = "invalid_credentials")]
+            InvalidCredentials,
+
+            #[serde(rename = "invalid_form")]
+            InvalidForm,
+
+            #[serde(rename = "invalid_payload")]
+            InvalidPayload,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct SessionCreateFailedResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub error: ::std::option::Option<components::schemas::SessionCreateFailedResponseError>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct SessionGetSuccessResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub user: ::std::option::Option<components::schemas::SessionUser>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum SessionDeleteFailureResponseError {
+            #[serde(rename = "invalid_payload")]
+            InvalidPayload,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct SessionDeleteFailureResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub error: ::std::option::Option<components::schemas::SessionDeleteFailureResponseError>,
 
         }
 

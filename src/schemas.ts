@@ -10,7 +10,7 @@ export function createRequestBody(schemas: Components, bodies: Components, inter
   return {
     add(name: string, schema: OpenAPIV3.RequestBodyObject) {
       const content = first(schema.content);
-      bodies.addExtra(`use super::schemas as schemas;`);
+      bodies.addExtra(`use super::schemas;`);
 
       if (content.schema && !internal.isRef(content.schema)) {
         schemaApi.add(`${name}RequestBody`, content.schema, true);
@@ -21,6 +21,25 @@ export function createRequestBody(schemas: Components, bodies: Components, inter
       }
 
       // TODO: add parsing request body from method definition
+    },
+  };
+}
+
+export function createResponse(schemas: Components, responses: Components, internal: Internal) {
+  const schemaApi = createSchema(schemas, internal);
+
+  return {
+    add(name: string, schema: OpenAPIV3.ResponseObject) {
+      if (!schema.content) return;
+      const content = first(schema.content);
+      responses.addExtra(`use super::schemas;`);
+
+      if (content.schema && !internal.isRef(content.schema)) {
+        schemaApi.add(`${name}Response`, content.schema, true);
+        responses.addComponent(name, template.pubType(name, `schemas::${name}Response`));
+      }
+
+      // TODO: add parsing response from method definition
     },
   };
 }

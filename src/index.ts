@@ -3,7 +3,7 @@ import { OpenAPIV3 } from 'openapi-types';
 import * as changeCase from 'change-case';
 import * as template from './template';
 import { Components } from './components';
-import { createRequestBody, createSchema, traverseSchema } from './schemas';
+import { createRequestBody, createResponse, createSchema, traverseSchema } from './schemas';
 
 const PACKAGE_NAME = 'openapi-preset-actix';
 
@@ -19,6 +19,7 @@ const preset: PresetConstructor<Options> = (
   const parameters = new Components();
   const schemas = new Components();
   const requestBodies = new Components();
+  const responses = new Components();
 
   if (frontmatter) {
     if (Array.isArray(frontmatter)) {
@@ -47,6 +48,10 @@ const preset: PresetConstructor<Options> = (
 
     onSchema(name: string, schema: OpenAPIV3.SchemaObject) {
       createSchema(schemas, internal).add(name, schema, true);
+    },
+
+    onResponse(name: string, response: OpenAPIV3.ResponseObject) {
+      createResponse(schemas, responses, internal).add(name, response);
     },
 
     onRequestBody(name: string, requestBody: OpenAPIV3.RequestBodyObject) {
@@ -109,8 +114,8 @@ const preset: PresetConstructor<Options> = (
         components.add(template.mod('parameters', parameters.build()));
       }
 
-      if (true) {
-        components.add(template.mod('responses', [].join('')));
+      if (responses.hasItems()) {
+        components.add(template.mod('responses', responses.build()));
       }
 
       if (requestBodies.hasItems()) {
