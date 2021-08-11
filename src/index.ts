@@ -33,6 +33,11 @@ const preset: PresetConstructor<Options> = (
     internal,
   };
 
+  const schemaHub = createSchema(context);
+  const responseHub = createResponse(context);
+  const requestBodyHub = createRequestBody(context);
+  const operationHub = createOperation(context);
+
   if (frontmatter) {
     if (Array.isArray(frontmatter)) {
       frontmatter.forEach((line) => parameters.addExtra(line));
@@ -57,19 +62,19 @@ const preset: PresetConstructor<Options> = (
     },
 
     onSchema(name: string, schema: OpenAPIV3.SchemaObject) {
-      createSchema(context).add(name, schema, true);
+      schemaHub.add(name, schema, true);
     },
 
     onResponse(name: string, response: OpenAPIV3.ResponseObject) {
-      createResponse(context).add(name, response);
+      responseHub.add(name, response);
     },
 
     onRequestBody(name: string, requestBody: OpenAPIV3.RequestBodyObject) {
-      createRequestBody(context).add(name, requestBody);
+      requestBodyHub.add(name, requestBody);
     },
 
     onOperation(pattern: string, method: Method, operation: OpenAPIV3.OperationObject) {
-      createOperation(context).add(pattern, method, operation);
+      operationHub.add(pattern, method, operation);
     },
 
     build(files: FilesApi) {
