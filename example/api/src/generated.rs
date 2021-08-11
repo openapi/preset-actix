@@ -2,15 +2,15 @@
 pub mod api {
 
     pub struct AccessoAppInternalApi {
-        api: actix_swagger::Api,
+        api: ::actix_swagger::Api,
     }
 
     pub fn create() -> AccessoAppInternalApi {
-        AccessoAppInternalApi { api: actix_swagger::Api::new() }
+        AccessoAppInternalApi { api: ::actix_swagger::Api::new() }
     }
 
-    impl actix_web::dev::HttpServiceFactory for AccessoAppInternalApi {
-        fn register(self, config: &mut actix_web::dev::AppService) {
+    impl ::actix_web::dev::HttpServiceFactory for AccessoAppInternalApi {
+        fn register(self, config: &mut ::actix_web::dev::AppService) {
             self.api.register(config);
         }
     }
@@ -165,9 +165,8 @@ pub mod paths {
         use super::responses;
         use ::actix_swagger::ContentType;
         use ::actix_web::http::StatusCode;
-        use ::serde::Serialize;
 
-        #[derive(Debug, Serialize)]
+        #[derive(Debug, ::serde::Serialize)]
         #[serde(untagged)]
         pub enum Response { 
             Ok(responses::OAuthAuthorizeDone)
@@ -181,7 +180,7 @@ pub mod paths {
             }
         }
 
-        #[derive(Debug, Serialize, ::thiserror::Error)]
+        #[derive(Debug, ::serde::Serialize, ::thiserror::Error)]
         pub enum Error {
             BadRequest(#[source] responses::OAuthAuthorizeRequestFailure),
             InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
@@ -219,9 +218,8 @@ pub mod paths {
         use super::responses;
         use ::actix_swagger::ContentType;
         use ::actix_web::http::StatusCode;
-        use ::serde::Serialize;
 
-        #[derive(Debug, Serialize)]
+        #[derive(Debug, ::serde::Serialize)]
         #[serde(untagged)]
         pub enum Response { 
             Ok
@@ -235,7 +233,7 @@ pub mod paths {
             }
         }
 
-        #[derive(Debug, Serialize, ::thiserror::Error)]
+        #[derive(Debug, ::serde::Serialize, ::thiserror::Error)]
         pub enum Error {
             BadRequest(#[source] responses::AccessRecoverySendEmailFailure),
             InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
@@ -273,9 +271,8 @@ pub mod paths {
         use super::responses;
         use ::actix_swagger::ContentType;
         use ::actix_web::http::StatusCode;
-        use ::serde::Serialize;
 
-        #[derive(Debug, Serialize)]
+        #[derive(Debug, ::serde::Serialize)]
         #[serde(untagged)]
         pub enum Response { 
             Ok
@@ -289,7 +286,7 @@ pub mod paths {
             }
         }
 
-        #[derive(Debug, Serialize, ::thiserror::Error)]
+        #[derive(Debug, ::serde::Serialize, ::thiserror::Error)]
         pub enum Error {
             BadRequest(#[source] responses::AccessRecoverySetPasswordFailure),
             InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
@@ -327,9 +324,8 @@ pub mod paths {
         use super::responses;
         use ::actix_swagger::ContentType;
         use ::actix_web::http::StatusCode;
-        use ::serde::Serialize;
 
-        #[derive(Debug, Serialize)]
+        #[derive(Debug, ::serde::Serialize)]
         #[serde(untagged)]
         pub enum Response { 
             Created(responses::RegistrationRequestCreated)
@@ -343,7 +339,7 @@ pub mod paths {
             }
         }
 
-        #[derive(Debug, Serialize, ::thiserror::Error)]
+        #[derive(Debug, ::serde::Serialize, ::thiserror::Error)]
         pub enum Error {
             BadRequest(#[source] responses::RegisterFailed),
             InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
@@ -381,9 +377,8 @@ pub mod paths {
         use super::responses;
         use ::actix_swagger::ContentType;
         use ::actix_web::http::StatusCode;
-        use ::serde::Serialize;
 
-        #[derive(Debug, Serialize)]
+        #[derive(Debug, ::serde::Serialize)]
         #[serde(untagged)]
         pub enum Response { 
             Created
@@ -397,7 +392,7 @@ pub mod paths {
             }
         }
 
-        #[derive(Debug, Serialize, ::thiserror::Error)]
+        #[derive(Debug, ::serde::Serialize, ::thiserror::Error)]
         pub enum Error {
             BadRequest(#[source] responses::RegisterConfirmationFailed),
             InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
@@ -435,9 +430,8 @@ pub mod paths {
         use super::responses;
         use ::actix_swagger::ContentType;
         use ::actix_web::http::StatusCode;
-        use ::serde::Serialize;
 
-        #[derive(Debug, Serialize)]
+        #[derive(Debug, ::serde::Serialize)]
         #[serde(untagged)]
         pub enum Response { 
             Created(responses::SessionCreateSucceeded)
@@ -451,7 +445,7 @@ pub mod paths {
             }
         }
 
-        #[derive(Debug, Serialize, ::thiserror::Error)]
+        #[derive(Debug, ::serde::Serialize, ::thiserror::Error)]
         pub enum Error {
             BadRequest(#[source] responses::SessionCreateFailed),
             InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
@@ -489,9 +483,8 @@ pub mod paths {
         use super::responses;
         use ::actix_swagger::ContentType;
         use ::actix_web::http::StatusCode;
-        use ::serde::Serialize;
 
-        #[derive(Debug, Serialize)]
+        #[derive(Debug, ::serde::Serialize)]
         #[serde(untagged)]
         pub enum Response { 
             Ok(responses::SessionGetSuccess)
@@ -505,7 +498,7 @@ pub mod paths {
             }
         }
 
-        #[derive(Debug, Serialize, ::thiserror::Error)]
+        #[derive(Debug, ::serde::Serialize, ::thiserror::Error)]
         pub enum Error {
             InternalServerError(#[from] #[serde(skip)] ::eyre::Report)
         }
@@ -524,9 +517,8 @@ pub mod paths {
         use super::responses;
         use ::actix_swagger::ContentType;
         use ::actix_web::http::StatusCode;
-        use ::serde::Serialize;
 
-        #[derive(Debug, Serialize)]
+        #[derive(Debug, ::serde::Serialize)]
         #[serde(untagged)]
         pub enum Response { 
             Ok
@@ -540,7 +532,7 @@ pub mod paths {
             }
         }
 
-        #[derive(Debug, Serialize, ::thiserror::Error)]
+        #[derive(Debug, ::serde::Serialize, ::thiserror::Error)]
         pub enum Error {
             BadRequest(#[source] responses::SessionDeleteFailure),
             Unauthorized(#[source] #[serde(skip)] ::eyre::Report),

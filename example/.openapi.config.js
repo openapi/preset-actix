@@ -6,5 +6,5 @@ module.exports = {
   //   'https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/api.github.com/api.github.com.json',
   file: './example/openapi.yaml',
   presets: [['./', {}]],
-  outputDir: `./example/api`,
+  outputDir: `./example/api/src`,
 };

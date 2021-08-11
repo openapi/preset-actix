@@ -3,13 +3,13 @@ import { status } from 'openapi';
 
 // language=Rust
 export const HeaderExtractor = `
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, ::serde::Serialize)]
 struct ParseHeaderError {
   error: String,
   message: String,
 }
 
-fn extract_header(req: &actix_web::HttpRequest, name: String) -> Result<String, ParseHeaderError> {
+fn extract_header(req: &::actix_web::HttpRequest, name: ::std::string::String) -> ::std::result::Result<::std::string::String, ParseHeaderError> {
   let header_error = ParseHeaderError {
       error: "header_required".to_string(),
       message: format!("header '{}' is required", name),
@@ -26,19 +26,19 @@ export function headerStructure(name: string, header: string): string {
   return `
 pub struct ${name}(pub String);
 
-impl actix_web::FromRequest for ${name} {
+impl ::actix_web::FromRequest for ${name} {
     type Config = ();
-    type Error = actix_web::Error;
-    type Future = futures::future::Ready<Result<Self, Self::Error>>;
+    type Error = ::actix_web::Error;
+    type Future = ::futures::future::Ready<::std::result::Result<Self, Self::Error>>;
 
     #[inline]
-    fn from_request(req: &actix_web::HttpRequest, _: &mut actix_web::dev::Payload) -> Self::Future {
+    fn from_request(req: &::actix_web::HttpRequest, _: &mut ::actix_web::dev::Payload) -> Self::Future {
         match extract_header(&req, "${header}".to_string()) {
-            Ok(value) => futures::future::ok(${name}(value)),
-            Err(reason) => match serde_json::to_string(&reason) {
-                Ok(json) => futures::future::err(actix_web::error::ErrorBadRequest(json)),
+            Ok(value) => ::futures::future::ok(${name}(value)),
+            Err(reason) => match ::serde_json::to_string(&reason) {
+                Ok(json) => ::futures::future::err(::actix_web::error::ErrorBadRequest(json)),
                 Err(error) => {
-                    futures::future::err(actix_web::error::ErrorInternalServerError(error))
+                    ::futures::future::err(::actix_web::error::ErrorInternalServerError(error))
                 }
             },
         }
@@ -52,15 +52,15 @@ export function apiStruct(apiName: string, methods: string): string {
 
   return `
 pub struct ${struct} {
-    api: actix_swagger::Api,
+    api: ::actix_swagger::Api,
 }
 
 pub fn create() -> ${struct} {
-    ${struct} { api: actix_swagger::Api::new() }
+    ${struct} { api: ::actix_swagger::Api::new() }
 }
 
-impl actix_web::dev::HttpServiceFactory for ${struct} {
-    fn register(self, config: &mut actix_web::dev::AppService) {
+impl ::actix_web::dev::HttpServiceFactory for ${struct} {
+    fn register(self, config: &mut ::actix_web::dev::AppService) {
         self.api.register(config);
     }
 }
@@ -190,9 +190,8 @@ pub mod ${moduleName} {
     use super::responses;
     use ::actix_swagger::ContentType;
     use ::actix_web::http::StatusCode;
-    use ::serde::Serialize;
 
-    #[derive(Debug, Serialize)]
+    #[derive(Debug, ::serde::Serialize)]
     #[serde(untagged)]
     pub enum Response { 
         ${tabulate(responseVariants, 2, true)}
@@ -206,7 +205,7 @@ pub mod ${moduleName} {
         }
     }
 
-    #[derive(Debug, Serialize, ::thiserror::Error)]
+    #[derive(Debug, ::serde::Serialize, ::thiserror::Error)]
     pub enum Error {
         ${tabulate(errorVariants, 2, true)}
     }
