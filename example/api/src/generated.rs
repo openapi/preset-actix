@@ -190,13 +190,13 @@ pub mod paths {
             fn status_code(&self) -> StatusCode {
                 match self { 
                     Self::BadRequest(_) => StatusCode::BAD_REQUEST,
-                    Self::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
+                    Self::InternalServerError(_) => StatusCode::INTERNAL_SERVER_ERROR
                 }
             }
             fn error_response(&self) -> ::actix_web::HttpResponse {
                 let content_type = match self {
                     Self::BadRequest(_) => Some(ContentType::Json),
-                    Self::InternalServerError => None
+                    Self::InternalServerError(_) => None
                 };
                 
                 let mut res = &mut ::actix_web::HttpResponse::build(self.status_code());
@@ -243,13 +243,13 @@ pub mod paths {
             fn status_code(&self) -> StatusCode {
                 match self { 
                     Self::BadRequest(_) => StatusCode::BAD_REQUEST,
-                    Self::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
+                    Self::InternalServerError(_) => StatusCode::INTERNAL_SERVER_ERROR
                 }
             }
             fn error_response(&self) -> ::actix_web::HttpResponse {
                 let content_type = match self {
                     Self::BadRequest(_) => Some(ContentType::Json),
-                    Self::InternalServerError => None
+                    Self::InternalServerError(_) => None
                 };
                 
                 let mut res = &mut ::actix_web::HttpResponse::build(self.status_code());
@@ -296,13 +296,13 @@ pub mod paths {
             fn status_code(&self) -> StatusCode {
                 match self { 
                     Self::BadRequest(_) => StatusCode::BAD_REQUEST,
-                    Self::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
+                    Self::InternalServerError(_) => StatusCode::INTERNAL_SERVER_ERROR
                 }
             }
             fn error_response(&self) -> ::actix_web::HttpResponse {
                 let content_type = match self {
                     Self::BadRequest(_) => Some(ContentType::Json),
-                    Self::InternalServerError => None
+                    Self::InternalServerError(_) => None
                 };
                 
                 let mut res = &mut ::actix_web::HttpResponse::build(self.status_code());
@@ -349,13 +349,13 @@ pub mod paths {
             fn status_code(&self) -> StatusCode {
                 match self { 
                     Self::BadRequest(_) => StatusCode::BAD_REQUEST,
-                    Self::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
+                    Self::InternalServerError(_) => StatusCode::INTERNAL_SERVER_ERROR
                 }
             }
             fn error_response(&self) -> ::actix_web::HttpResponse {
                 let content_type = match self {
                     Self::BadRequest(_) => Some(ContentType::Json),
-                    Self::InternalServerError => None
+                    Self::InternalServerError(_) => None
                 };
                 
                 let mut res = &mut ::actix_web::HttpResponse::build(self.status_code());
@@ -402,13 +402,13 @@ pub mod paths {
             fn status_code(&self) -> StatusCode {
                 match self { 
                     Self::BadRequest(_) => StatusCode::BAD_REQUEST,
-                    Self::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
+                    Self::InternalServerError(_) => StatusCode::INTERNAL_SERVER_ERROR
                 }
             }
             fn error_response(&self) -> ::actix_web::HttpResponse {
                 let content_type = match self {
                     Self::BadRequest(_) => Some(ContentType::Json),
-                    Self::InternalServerError => None
+                    Self::InternalServerError(_) => None
                 };
                 
                 let mut res = &mut ::actix_web::HttpResponse::build(self.status_code());
@@ -455,13 +455,13 @@ pub mod paths {
             fn status_code(&self) -> StatusCode {
                 match self { 
                     Self::BadRequest(_) => StatusCode::BAD_REQUEST,
-                    Self::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
+                    Self::InternalServerError(_) => StatusCode::INTERNAL_SERVER_ERROR
                 }
             }
             fn error_response(&self) -> ::actix_web::HttpResponse {
                 let content_type = match self {
                     Self::BadRequest(_) => Some(ContentType::Json),
-                    Self::InternalServerError => None
+                    Self::InternalServerError(_) => None
                 };
                 
                 let mut res = &mut ::actix_web::HttpResponse::build(self.status_code());
@@ -506,7 +506,7 @@ pub mod paths {
         impl ::actix_web::ResponseError for Error {
             fn status_code(&self) -> StatusCode {
                 match self { 
-                    Self::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
+                    Self::InternalServerError(_) => StatusCode::INTERNAL_SERVER_ERROR
                 }
             }
             
@@ -543,15 +543,15 @@ pub mod paths {
             fn status_code(&self) -> StatusCode {
                 match self { 
                     Self::BadRequest(_) => StatusCode::BAD_REQUEST,
-                    Self::Unauthorized => StatusCode::UNAUTHORIZED,
-                    Self::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR
+                    Self::Unauthorized(_) => StatusCode::UNAUTHORIZED,
+                    Self::InternalServerError(_) => StatusCode::INTERNAL_SERVER_ERROR
                 }
             }
             fn error_response(&self) -> ::actix_web::HttpResponse {
                 let content_type = match self {
                     Self::BadRequest(_) => Some(ContentType::Json),
-                    Self::Unauthorized => None,
-                    Self::InternalServerError => None
+                    Self::Unauthorized(_) => None,
+                    Self::InternalServerError(_) => None
                 };
                 
                 let mut res = &mut ::actix_web::HttpResponse::build(self.status_code());
@@ -597,7 +597,7 @@ pub mod components {
 
     pub mod schemas {
         use serde::{Deserialize, Serialize};
-        use super as components;
+        use super::super::components;
 
         #[derive(Debug, Serialize, Deserialize)]
         pub enum OAuthAuthorizeRequestBodyResponseType {

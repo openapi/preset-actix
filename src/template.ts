@@ -146,18 +146,16 @@ export function pathModule(
 
   const errorStatusMatchers = errVariants
     .map((variant) => {
-      const matcher = variant.contentType ? `(_)` : '';
       const name = changeCase.pascalCase(variant.upper);
-      return `Self::${name}${matcher} => StatusCode::${variant.upper}`;
+      return `Self::${name}(_) => StatusCode::${variant.upper}`;
     })
     .join(',\n');
 
   const contentTypeMatcher = errVariants
     .map((variant) => {
-      const matcher = variant.contentType ? `(_)` : '';
       const content = variant.contentType ? `Some(ContentType::Json)` : 'None';
       const name = changeCase.pascalCase(variant.upper);
-      return `Self::${name}${matcher} => ${content}`;
+      return `Self::${name}(_) => ${content}`;
     })
     .join(',\n');
 
@@ -244,7 +242,7 @@ export const SchemasExtra = `use serde::{Deserialize, Serialize};
 
 export const DeriveSerde = `#[derive(Debug, Serialize, Deserialize)]`;
 // language=Rust
-export const UseParentComponents = `use super as components;
+export const UseParentComponents = `use super::super::components;
 `;
 
 export function struct(
