@@ -40,10 +40,13 @@ export function createRequestBody(ctx: Context) {
       ctx.requestBodies.addExtra(`use super::schemas;`);
 
       if (content.schema && !ctx.internal.isRef(content.schema)) {
-        schemaApi.add(`${name}RequestBody`, content.schema, true);
+        schemaApi.add(`${name}_RequestBody`, content.schema, true);
         ctx.requestBodies.addComponent(
           name,
-          template.pubType(name, template.webJson(`schemas::${name}RequestBody`)),
+          template.pubType(
+            name,
+            template.webJson(`schemas::${changeCase.pascalCase(name)}RequestBody`),
+          ),
         );
       }
 
@@ -81,6 +84,10 @@ export function createOperation(ctx: Context) {
       const operationId = operation.operationId ?? pattern;
       const moduleName = changeCase.snakeCase(operationId);
 
+      if (operation.requestBody && !ctx.internal.isRef(operation.requestBody)) {
+        requestBodyApi.add(`${operationId}`, operation.requestBody);
+      }
+
       const responses = Object.entries(operation.responses ?? {}).map(([code, refOrResponse]) => {
         const response = ctx.internal.isRef(refOrResponse)
           ? (ctx.internal.resolveRef(refOrResponse.$ref) as OpenAPIV3.ResponseObject)
@@ -104,7 +111,13 @@ export function createOperation(ctx: Context) {
 
 export function createSchema(ctx: Context) {
   const api = {
-    add(name: string, schema: OpenAPIV3.SchemaObject, named = false, derive: string | null = null) {
+    add(
+      originalName: string,
+      schema: OpenAPIV3.SchemaObject,
+      named = false,
+      derive: string | null = null,
+    ) {
+      const name = changeCase.pascalCase(originalName);
       ctx.schemas.addExtra(template.SchemasExtra);
 
       if (isSchemaArray(schema)) {

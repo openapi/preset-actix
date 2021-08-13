@@ -993,6 +993,28 @@ pub mod components {
         use super::schemas;
         pub type SessionDelete = ::actix_web::web::Json<schemas::SessionDeleteRequestBody>;
          
+        pub type AuthDone = ::actix_web::web::Json<schemas::AuthDoneRequestBody>;
+         
+        pub type AuthParams = ::actix_web::web::Json<schemas::AuthParamsRequestBody>;
+         
+        pub type CardsSearch = ::actix_web::web::Json<schemas::CardsSearchRequestBody>;
+         
+        pub type CardsList = ::actix_web::web::Json<schemas::CardsListRequestBody>;
+         
+        pub type CardsGet = ::actix_web::web::Json<schemas::CardsGetRequestBody>;
+         
+        pub type CardsCreate = ::actix_web::web::Json<schemas::CardsCreateRequestBody>;
+         
+        pub type CardsEdit = ::actix_web::web::Json<schemas::CardsEditRequestBody>;
+         
+        pub type CardsDelete = ::actix_web::web::Json<schemas::CardsDeleteRequestBody>;
+         
+        pub type CardsSave = ::actix_web::web::Json<schemas::CardsSaveRequestBody>;
+         
+        pub type UsersSearch = ::actix_web::web::Json<schemas::UsersSearchRequestBody>;
+         
+        pub type UsersGet = ::actix_web::web::Json<schemas::UsersGetRequestBody>;
+         
     }
 
     pub mod schemas {
@@ -1156,6 +1178,108 @@ pub mod components {
             #[serde(skip_serializing_if = "::std::option::Option::is_none")]
             pub link: ::std::option::Option<::std::string::String>,
 
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub username: ::std::option::Option<::std::string::String>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct AuthDoneRequestBody {
+            #[serde(rename = "authorizationCode")]
+            pub authorization_code: ::std::string::String,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct AuthParamsRequestBody {
+            pub state: ::std::string::String,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsSearchRequestBody {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub query: ::std::option::Option<::std::string::String>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsListRequestBody {
+            #[serde(rename = "authorId")]
+            pub author_id: ::uuid::Uuid,
+
+            pub favorites: bool,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsGetRequestBody {
+            #[serde(rename = "cardId")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub card_id: ::std::option::Option<::uuid::Uuid>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsCreateRequestBodyContent {
+
+        }
+
+        pub type CardsCreateRequestBodyTags = ::std::vec::Vec<::std::string::String>;
+         
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsCreateRequestBody {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub title: ::std::option::Option<::std::string::String>,
+
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub content: ::std::option::Option<components::schemas::CardsCreateRequestBodyContent>,
+
+            pub tags: components::schemas::CardsCreateRequestBodyTags,
+
+        }
+
+        pub type CardsEditRequestBodyTags = ::std::vec::Vec<::std::string::String>;
+         
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsEditRequestBody {
+            #[serde(rename = "cardId")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub card_id: ::std::option::Option<::uuid::Uuid>,
+
+            pub title: ::std::string::String,
+
+            pub content: ::std::collections::HashMap<::std::string::String, ::serde_json::value::Value>,
+
+            pub tags: components::schemas::CardsEditRequestBodyTags,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsDeleteRequestBody {
+            #[serde(rename = "cardId")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub card_id: ::std::option::Option<::uuid::Uuid>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsSaveRequestBody {
+            #[serde(rename = "cardId")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub card_id: ::std::option::Option<::uuid::Uuid>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct UsersSearchRequestBody {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub query: ::std::option::Option<::std::string::String>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct UsersGetRequestBody {
             #[serde(skip_serializing_if = "::std::option::Option::is_none")]
             pub username: ::std::option::Option<::std::string::String>,
 
