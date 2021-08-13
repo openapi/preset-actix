@@ -248,7 +248,7 @@ ${tabulate(children)}
 export const SchemasExtra = `use serde::{Deserialize, Serialize};
 `;
 
-export const DeriveSerde = `#[derive(Debug, Serialize, Deserialize)]`;
+export const DeruveSchemaStruct = `#[derive(Debug, ::serde::Serialize, ::serde::Deserialize, ::thiserror::Error)]`;
 // language=Rust
 export const UseParentComponents = `use super::super::components;
 `;
@@ -288,6 +288,7 @@ export function enumeration(name: string, variants: Set<string>, derive = ''): s
     if (pascalName !== variant) {
       lines.push(`#[serde(rename = "${variant}")]`);
     }
+    lines.push(`#[error("${changeCase.sentenceCase(name + '_' + variant)}")]`);
     lines.push(`${pascalName},\n`);
   }
 

@@ -78,11 +78,6 @@ export function createResponse(ctx: Context) {
   };
 }
 
-const mediaToContentType = {
-  'application/json': 'json',
-  'multipart/form-data': 'formdata',
-};
-
 export function createOperation(ctx: Context) {
   const requestBodyApi = createRequestBody(ctx);
   const schemaApi = createSchema(ctx);
@@ -175,7 +170,7 @@ export function createSchema(ctx: Context) {
           template.enumeration(
             name,
             new Set(schema.enum),
-            `#[derive(Debug, Serialize, Deserialize)]`,
+            `#[derive(Debug, ::serde::Serialize, ::serde::Deserialize, ::thiserror::Error)]`,
           ),
         );
         return `components::schemas::${changeCase.pascalCase(name)}`;
@@ -210,7 +205,7 @@ export function createSchema(ctx: Context) {
             reservedWord: keywords.includes(propName),
           });
         }
-        ctx.schemas.addComponent(name, template.struct(name, fields, template.DeriveSerde));
+        ctx.schemas.addComponent(name, template.struct(name, fields, template.DeruveSchemaStruct));
         return `components::schemas::${changeCase.pascalCase(name)}`;
       }
 
