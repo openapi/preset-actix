@@ -299,7 +299,7 @@ pub mod paths {
                 }
             }
             fn error_response(&self) -> ::actix_web::HttpResponse {
-                let content_type = match self {
+                let content_type: ::std::option::Option<ContentType> = match self {
                     Self::Unauthorized(_) => Some(ContentType::Json),
                     Self::InternalServerError(_) => None
                 };
@@ -463,7 +463,7 @@ pub mod paths {
                 }
             }
             fn error_response(&self) -> ::actix_web::HttpResponse {
-                let content_type = match self {
+                let content_type: ::std::option::Option<ContentType> = match self {
                     Self::BadRequest(_) => Some(ContentType::Json),
                     Self::InternalServerError(_) => None
                 };
@@ -519,7 +519,7 @@ pub mod paths {
                 }
             }
             fn error_response(&self) -> ::actix_web::HttpResponse {
-                let content_type = match self {
+                let content_type: ::std::option::Option<ContentType> = match self {
                     Self::BadRequest(_) => Some(ContentType::Json),
                     Self::InternalServerError(_) => None
                 };
@@ -575,7 +575,7 @@ pub mod paths {
                 }
             }
             fn error_response(&self) -> ::actix_web::HttpResponse {
-                let content_type = match self {
+                let content_type: ::std::option::Option<ContentType> = match self {
                     Self::BadRequest(_) => Some(ContentType::Json),
                     Self::InternalServerError(_) => None
                 };
@@ -631,7 +631,7 @@ pub mod paths {
                 }
             }
             fn error_response(&self) -> ::actix_web::HttpResponse {
-                let content_type = match self {
+                let content_type: ::std::option::Option<ContentType> = match self {
                     Self::BadRequest(_) => Some(ContentType::Json),
                     Self::InternalServerError(_) => None
                 };
@@ -687,7 +687,7 @@ pub mod paths {
                 }
             }
             fn error_response(&self) -> ::actix_web::HttpResponse {
-                let content_type = match self {
+                let content_type: ::std::option::Option<ContentType> = match self {
                     Self::BadRequest(_) => Some(ContentType::Json),
                     Self::InternalServerError(_) => None
                 };
@@ -743,7 +743,7 @@ pub mod paths {
                 }
             }
             fn error_response(&self) -> ::actix_web::HttpResponse {
-                let content_type = match self {
+                let content_type: ::std::option::Option<ContentType> = match self {
                     Self::BadRequest(_) => Some(ContentType::Json),
                     Self::InternalServerError(_) => None
                 };
@@ -799,7 +799,7 @@ pub mod paths {
                 }
             }
             fn error_response(&self) -> ::actix_web::HttpResponse {
-                let content_type = match self {
+                let content_type: ::std::option::Option<ContentType> = match self {
                     Self::Unauthorized(_) => None,
                     Self::InternalServerError(_) => None
                 };
@@ -858,7 +858,7 @@ pub mod paths {
                 }
             }
             fn error_response(&self) -> ::actix_web::HttpResponse {
-                let content_type = match self {
+                let content_type: ::std::option::Option<ContentType> = match self {
                     Self::BadRequest(_) => Some(ContentType::Json),
                     Self::Unauthorized(_) => None,
                     Self::InternalServerError(_) => None
@@ -951,7 +951,7 @@ pub mod paths {
                 }
             }
             fn error_response(&self) -> ::actix_web::HttpResponse {
-                let content_type = match self {
+                let content_type: ::std::option::Option<ContentType> = match self {
                     Self::BadRequest(_) => Some(ContentType::Json),
                     Self::InternalServerError(_) => None
                 };
@@ -986,6 +986,40 @@ pub mod components {
         pub type SessionGetSuccess = schemas::SessionGetSuccessResponse;
          
         pub type SessionDeleteFailure = schemas::SessionDeleteFailureResponse;
+         
+        pub type CardsSearchOk = schemas::CardsSearchOkResponse;
+         
+        pub type CardsFeedOk = schemas::CardsFeedOkResponse;
+         
+        pub type CardsListOk = schemas::CardsListOkResponse;
+         
+        pub type CardsListBadRequest = schemas::CardsListBadRequestResponse;
+         
+        pub type CardsGetOk = schemas::CardsGetOkResponse;
+         
+        pub type CardsGetBadRequest = schemas::CardsGetBadRequestResponse;
+         
+        pub type CardsCreateOk = schemas::CardsCreateOkResponse;
+         
+        pub type CardsCreateBadRequest = schemas::CardsCreateBadRequestResponse;
+         
+        pub type CardsEditOk = schemas::CardsEditOkResponse;
+         
+        pub type CardsEditBadRequest = schemas::CardsEditBadRequestResponse;
+         
+        pub type CardsDeleteOk = schemas::CardsDeleteOkResponse;
+         
+        pub type CardsDeleteBadRequest = schemas::CardsDeleteBadRequestResponse;
+         
+        pub type CardsSaveOk = schemas::CardsSaveOkResponse;
+         
+        pub type CardsSaveBadRequest = schemas::CardsSaveBadRequestResponse;
+         
+        pub type UsersSearchOk = schemas::UsersSearchOkResponse;
+         
+        pub type UsersGetOk = schemas::UsersGetOkResponse;
+         
+        pub type UsersGetBadRequest = schemas::UsersGetBadRequestResponse;
          
     }
 
@@ -1203,6 +1237,58 @@ pub mod components {
 
         }
 
+        pub type CardsSearchOkResponseCards = ::std::vec::Vec<components::schemas::Card>;
+         
+        pub type CardsSearchOkResponseUsers = ::std::vec::Vec<components::schemas::User>;
+         
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsSearchOkResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub cards: ::std::option::Option<components::schemas::CardsSearchOkResponseCards>,
+
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub users: ::std::option::Option<components::schemas::CardsSearchOkResponseUsers>,
+
+        }
+
+        pub type CardsFeedOkResponseTopCards = ::std::vec::Vec<components::schemas::Card>;
+         
+        pub type CardsFeedOkResponseTopUsers = ::std::vec::Vec<components::schemas::User>;
+         
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsFeedOkResponseTop {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub cards: ::std::option::Option<components::schemas::CardsFeedOkResponseTopCards>,
+
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub users: ::std::option::Option<components::schemas::CardsFeedOkResponseTopUsers>,
+
+        }
+
+        pub type CardsFeedOkResponseLatestCards = ::std::vec::Vec<components::schemas::Card>;
+         
+        pub type CardsFeedOkResponseLatestUsers = ::std::vec::Vec<components::schemas::User>;
+         
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsFeedOkResponseLatest {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub cards: ::std::option::Option<components::schemas::CardsFeedOkResponseLatestCards>,
+
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub users: ::std::option::Option<components::schemas::CardsFeedOkResponseLatestUsers>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsFeedOkResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub top: ::std::option::Option<components::schemas::CardsFeedOkResponseTop>,
+
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub latest: ::std::option::Option<components::schemas::CardsFeedOkResponseLatest>,
+
+        }
+
         #[derive(Debug, Serialize, Deserialize)]
         pub struct CardsListRequestBody {
             #[serde(rename = "authorId")]
@@ -1212,11 +1298,69 @@ pub mod components {
 
         }
 
+        pub type CardsListOkResponseCards = ::std::vec::Vec<components::schemas::Card>;
+         
+        pub type CardsListOkResponseUsers = ::std::vec::Vec<components::schemas::User>;
+         
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsListOkResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub cards: ::std::option::Option<components::schemas::CardsListOkResponseCards>,
+
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub users: ::std::option::Option<components::schemas::CardsListOkResponseUsers>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum CardsListBadRequestResponseCode {
+            #[serde(rename = "invalid_params")]
+            InvalidParams,
+
+            #[serde(rename = "unauthorized")]
+            Unauthorized,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsListBadRequestResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub error: ::std::option::Option<bool>,
+
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub code: ::std::option::Option<components::schemas::CardsListBadRequestResponseCode>,
+
+        }
+
         #[derive(Debug, Serialize, Deserialize)]
         pub struct CardsGetRequestBody {
             #[serde(rename = "cardId")]
             #[serde(skip_serializing_if = "::std::option::Option::is_none")]
             pub card_id: ::std::option::Option<::uuid::Uuid>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsGetOkResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub card: ::std::option::Option<components::schemas::Card>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum CardsGetBadRequestResponseCode {
+            #[serde(rename = "card_not_found")]
+            CardNotFound,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsGetBadRequestResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub error: ::std::option::Option<bool>,
+
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub code: ::std::option::Option<components::schemas::CardsGetBadRequestResponseCode>,
 
         }
 
@@ -1239,6 +1383,30 @@ pub mod components {
 
         }
 
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsCreateOkResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub card: ::std::option::Option<components::schemas::Card>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum CardsCreateBadRequestResponseError {
+            #[serde(rename = "empty_title")]
+            EmptyTitle,
+
+            #[serde(rename = "invalid_content")]
+            InvalidContent,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsCreateBadRequestResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub error: ::std::option::Option<components::schemas::CardsCreateBadRequestResponseError>,
+
+        }
+
         pub type CardsEditRequestBodyTags = ::std::vec::Vec<::std::string::String>;
          
         #[derive(Debug, Serialize, Deserialize)]
@@ -1256,10 +1424,62 @@ pub mod components {
         }
 
         #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsEditOkResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub card: ::std::option::Option<components::schemas::Card>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum CardsEditBadRequestResponseError {
+            #[serde(rename = "card_not_found")]
+            CardNotFound,
+
+            #[serde(rename = "invalid_payload")]
+            InvalidPayload,
+
+            #[serde(rename = "no_access")]
+            NoAccess,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsEditBadRequestResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub error: ::std::option::Option<components::schemas::CardsEditBadRequestResponseError>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
         pub struct CardsDeleteRequestBody {
             #[serde(rename = "cardId")]
             #[serde(skip_serializing_if = "::std::option::Option::is_none")]
             pub card_id: ::std::option::Option<::uuid::Uuid>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsDeleteOkResponse {
+            #[serde(rename = "cardId")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub card_id: ::std::option::Option<::uuid::Uuid>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum CardsDeleteBadRequestResponseError {
+            #[serde(rename = "card_not_found")]
+            CardNotFound,
+
+            #[serde(rename = "no_access")]
+            NoAccess,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsDeleteBadRequestResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub error: ::std::option::Option<components::schemas::CardsDeleteBadRequestResponseError>,
 
         }
 
@@ -1272,9 +1492,52 @@ pub mod components {
         }
 
         #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsSaveOkResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub card: ::std::option::Option<components::schemas::Card>,
+
+            #[serde(rename = "boxId")]
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub box_id: ::std::option::Option<::uuid::Uuid>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum CardsSaveBadRequestResponseCode {
+            #[serde(rename = "already_saved")]
+            AlreadySaved,
+
+            #[serde(rename = "card_not_found")]
+            CardNotFound,
+
+            #[serde(rename = "no_access")]
+            NoAccess,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct CardsSaveBadRequestResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub error: ::std::option::Option<bool>,
+
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub code: ::std::option::Option<components::schemas::CardsSaveBadRequestResponseCode>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
         pub struct UsersSearchRequestBody {
             #[serde(skip_serializing_if = "::std::option::Option::is_none")]
             pub query: ::std::option::Option<::std::string::String>,
+
+        }
+
+        pub type UsersSearchOkResponseUsers = ::std::vec::Vec<components::schemas::User>;
+         
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct UsersSearchOkResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub users: ::std::option::Option<components::schemas::UsersSearchOkResponseUsers>,
 
         }
 
@@ -1282,6 +1545,30 @@ pub mod components {
         pub struct UsersGetRequestBody {
             #[serde(skip_serializing_if = "::std::option::Option::is_none")]
             pub username: ::std::option::Option<::std::string::String>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct UsersGetOkResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub user: ::std::option::Option<components::schemas::User>,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub enum UsersGetBadRequestResponseCode {
+            #[serde(rename = "user_not_found")]
+            UserNotFound,
+
+        }
+
+        #[derive(Debug, Serialize, Deserialize)]
+        pub struct UsersGetBadRequestResponse {
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub error: ::std::option::Option<bool>,
+
+            #[serde(skip_serializing_if = "::std::option::Option::is_none")]
+            pub code: ::std::option::Option<components::schemas::UsersGetBadRequestResponseCode>,
 
         }
 

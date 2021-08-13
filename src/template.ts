@@ -111,7 +111,8 @@ export function pathModule(
 
   const responseVariants = okVariants
     .map((variant) => {
-      const content = variant.contentType ? `(responses::${variant.name})` : '';
+      const responseName = changeCase.pascalCase(variant.name);
+      const content = variant.contentType ? `(responses::${responseName})` : '';
       const name = changeCase.pascalCase(variant.upper);
       return `${name}${content}`;
     })
@@ -136,12 +137,14 @@ export function pathModule(
   const errorVariants = errVariants
     .map((variant) => {
       const content = variant.contentType
-        ? `responses::${variant.name}`
+        ? `responses::${changeCase.pascalCase(variant.name)}`
         : `#[serde(skip)] ::eyre::Report`;
+
       const isTransparent = variant.code === 500;
       const errorDerive = isTransparent
         ? `#[error(transparent)]\n`
         : `#[error("${changeCase.sentenceCase(variant.name)}")]\n`;
+
       const name = changeCase.pascalCase(variant.upper);
       const inference = isTransparent ? 'from' : 'source'; // to handle `error?;`
       return `${errorDerive}${name}(#[${inference}] ${content})`;
@@ -169,7 +172,7 @@ export function pathModule(
       : // language=Rust
         `
 fn error_response(&self) -> ::actix_web::HttpResponse {
-    let content_type = match self {
+    let content_type: ::std::option::Option<ContentType> = match self {
         ${tabulate(contentTypeMatcher, 2, true)}
     };
     

@@ -1,8 +1,9 @@
-import { OpenAPIV3 } from 'openapi-types';
+import { MediaTypeObject, OpenAPIV3 } from 'openapi-types';
 import { Components } from './components';
 import { Internal, Method, status } from 'openapi';
 import * as template from './template';
 import * as changeCase from 'change-case';
+import { pascalCase } from 'change-case';
 
 interface Context {
   schemas: Components;
@@ -66,13 +67,21 @@ export function createResponse(ctx: Context) {
 
       if (content.schema && !ctx.internal.isRef(content.schema)) {
         schemaApi.add(`${name}Response`, content.schema, true);
-        ctx.responses.addComponent(name, template.pubType(name, `schemas::${name}Response`));
+        ctx.responses.addComponent(
+          name,
+          template.pubType(name, `schemas::${changeCase.pascalCase(name)}Response`),
+        );
       }
 
       // TODO: add parsing response from method definition
     },
   };
 }
+
+const mediaToContentType = {
+  'application/json': 'json',
+  'multipart/form-data': 'formdata',
+};
 
 export function createOperation(ctx: Context) {
   const requestBodyApi = createRequestBody(ctx);
@@ -88,25 +97,47 @@ export function createOperation(ctx: Context) {
         requestBodyApi.add(`${operationId}`, operation.requestBody);
       }
 
-      const responses = Object.entries(operation.responses ?? {}).map(([code, refOrResponse]) => {
-        const response = ctx.internal.isRef(refOrResponse)
-          ? (ctx.internal.resolveRef(refOrResponse.$ref) as OpenAPIV3.ResponseObject)
-          : refOrResponse;
+      const responses = Object.entries(operation.responses ?? {}).map(
+        ([codeString, refOrResponse]) => {
+          const code = parseInt(codeString, 10);
+          const humanReadableStatus = status[code as keyof typeof status]?.code ?? code;
 
-        const humanReadableStatus = status[Number(code) as keyof typeof status]?.code ?? code;
-        const name = ctx.internal.isRef(refOrResponse)
-          ? refOrResponse.$ref.split('/').pop()!
-          : `${changeCase.pascalCase(operationId)}${changeCase.pascalCase(humanReadableStatus)}`;
+          if (ctx.internal.isRef(refOrResponse)) {
+            // Response will be created in onResponse hook
 
-        const contentType = response.content?.['application/json'] ? 'json' : undefined;
+            const name = latest(refOrResponse.$ref.split('/'));
+            const response = ctx.internal.resolveRef(
+              refOrResponse.$ref,
+            ) as OpenAPIV3.ResponseObject;
+            const contentType = getContentType(response.content ?? {});
+            return { code, contentType, name };
+          }
 
-        return { code: parseInt(code, 10), contentType, name };
-      });
+          const name = [operationId, humanReadableStatus]
+            .map((n) => changeCase.pascalCase(n))
+            .join('_');
+          const contentType = getContentType(refOrResponse.content ?? {});
+
+          responseApi.add(name, refOrResponse);
+
+          return { code, contentType, name };
+        },
+      );
 
       ctx.paths.addComponent(operationId, template.pathModule(operationId, responses));
       ctx.binders.addComponent(operationId, template.pathBind(operationId, pattern, method));
     },
   };
+}
+
+function getContentType(mediaObject: { [media: string]: OpenAPIV3.MediaTypeObject }) {
+  if (mediaObject['application/json']) return 'json';
+  if (mediaObject['multipart/form-data']) return 'form-data';
+  return undefined;
+}
+
+function latest<T>(list: T[]): T {
+  return list[list.length - 1];
 }
 
 export function createSchema(ctx: Context) {
