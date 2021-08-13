@@ -13,6 +13,24 @@ interface Context {
   internal: Internal;
 }
 
+const keywords = [
+  'crate',
+  'enum',
+  'fn',
+  'for',
+  'impl',
+  'match',
+  'mod',
+  'pub',
+  'self',
+  'struct',
+  'super',
+  'type',
+  'union',
+  'use',
+  'where',
+];
+
 export function createRequestBody(ctx: Context) {
   const schemaApi = createSchema(ctx);
 
@@ -128,7 +146,10 @@ export function createSchema(ctx: Context) {
       }
 
       if (isSchemaObject(schema)) {
-        const fields = new Map<string, { content: string; skipSerialize: boolean }>();
+        const fields = new Map<
+          string,
+          { content: string; skipSerialize: boolean; reservedWord: boolean }
+        >();
         for (const [propName, type] of Object.entries(schema.properties ?? {})) {
           const skipSerialize = schema.required?.includes(propName) ?? false;
           // check for nullable?
@@ -139,7 +160,11 @@ export function createSchema(ctx: Context) {
             ? refToRust(type.$ref)
             : api.add(`${name}_${propName}`, type);
           const content = skipSerialize ? `::std::option::Option<${realType}>` : realType;
-          fields.set(propName, { content, skipSerialize });
+          fields.set(propName, {
+            content,
+            skipSerialize,
+            reservedWord: keywords.includes(propName),
+          });
         }
         ctx.schemas.addComponent(name, template.struct(name, fields, template.DeriveSerde));
         return `components::schemas::${changeCase.pascalCase(name)}`;

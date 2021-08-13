@@ -252,20 +252,21 @@ export const UseParentComponents = `use super::super::components;
 
 export function struct(
   name: string,
-  fields: Map<string, { content: string; skipSerialize: boolean }>,
+  fields: Map<string, { content: string; skipSerialize: boolean; reservedWord: boolean }>,
   derive = '',
 ) {
   const structName = changeCase.pascalCase(name);
   const lines = [];
-  for (const [property, { content: type, skipSerialize }] of fields.entries()) {
+  for (const [property, { content: type, skipSerialize, reservedWord }] of fields.entries()) {
     const snakeName = changeCase.snakeCase(property);
-    if (snakeName !== property) {
+    const raw = reservedWord ? 'r#' : '';
+    if (snakeName !== property || reservedWord) {
       lines.push(`#[serde(rename = "${property}")]`);
     }
     if (skipSerialize) {
       lines.push(`#[serde(skip_serializing_if = "::std::option::Option::is_none")]`);
     }
-    lines.push(`pub ${snakeName}: ${type},\n`);
+    lines.push(`pub ${raw}${snakeName}: ${type},\n`);
   }
   return `
 ${derive}

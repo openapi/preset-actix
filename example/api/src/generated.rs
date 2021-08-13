@@ -1149,8 +1149,9 @@ pub mod components {
             #[serde(skip_serializing_if = "::std::option::Option::is_none")]
             pub id: ::std::option::Option<::uuid::Uuid>,
 
+            #[serde(rename = "type")]
             #[serde(skip_serializing_if = "::std::option::Option::is_none")]
-            pub type: ::std::option::Option<::std::string::String>,
+            pub r#type: ::std::option::Option<::std::string::String>,
 
             #[serde(skip_serializing_if = "::std::option::Option::is_none")]
             pub link: ::std::option::Option<::std::string::String>,
