@@ -25,3 +25,4 @@ time = "0.2.26"
 thiserror = "1.0.26"
 validator = "0.14.0"
 uuid = { version = "0.8.2", features = ["v4", "serde"] }
+derive_more = "0.99.16"

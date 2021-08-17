@@ -272,6 +272,7 @@ dependencies = [
  "actix-swagger",
  "actix-web",
  "chrono",
+ "derive_more",
  "eyre",
  "futures",
  "serde",

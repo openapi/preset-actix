@@ -248,7 +248,7 @@ ${tabulate(children)}
 export const SchemasExtra = `use serde::{Deserialize, Serialize};
 `;
 
-export const DeruveSchemaStruct = `#[derive(Debug, ::serde::Serialize, ::serde::Deserialize, ::thiserror::Error)]`;
+export const DeruveSchemaStruct = `#[derive(Debug, ::serde::Serialize, ::serde::Deserialize, ::derive_more::Display)]`;
 // language=Rust
 export const UseParentComponents = `use super::super::components;
 `;
@@ -257,6 +257,7 @@ export function struct(
   name: string,
   fields: Map<string, { content: string; skipSerialize: boolean; reservedWord: boolean }>,
   derive = '',
+  attributes: string[] = [],
 ) {
   const structName = changeCase.pascalCase(name);
   const lines = [];
@@ -271,8 +272,10 @@ export function struct(
     }
     lines.push(`pub ${raw}${snakeName}: ${type},\n`);
   }
+  const attrs = attributes.map((attr) => `\n#[${attr}]`).join('');
   return `
 ${derive}
+${attrs}
 pub struct ${structName} {
 ${lines.map((i) => tabulate(i)).join('\n')}
 }

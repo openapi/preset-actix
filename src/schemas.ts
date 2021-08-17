@@ -1,9 +1,8 @@
-import { MediaTypeObject, OpenAPIV3 } from 'openapi-types';
+import { OpenAPIV3 } from 'openapi-types';
 import { Components } from './components';
 import { Internal, Method, status } from 'openapi';
 import * as template from './template';
 import * as changeCase from 'change-case';
-import { pascalCase } from 'change-case';
 
 interface Context {
   schemas: Components;
@@ -66,7 +65,13 @@ export function createResponse(ctx: Context) {
       ctx.responses.addExtra(`use super::schemas;`);
 
       if (content.schema && !ctx.internal.isRef(content.schema)) {
-        schemaApi.add(`${name}Response`, content.schema, true);
+        schemaApi.add(
+          `${name}Response`,
+          content.schema,
+          true,
+          ['::thiserror::Error'],
+          [`error("${changeCase.sentenceCase(name)}")`],
+        );
         ctx.responses.addComponent(
           name,
           template.pubType(name, `schemas::${changeCase.pascalCase(name)}Response`),
@@ -135,13 +140,19 @@ function latest<T>(list: T[]): T {
   return list[list.length - 1];
 }
 
+function createDerive(list: Array<string | null>): string {
+  const items = list.filter(Boolean).join(', ');
+  return `#[derive(${items})]`;
+}
+
 export function createSchema(ctx: Context) {
   const api = {
     add(
       originalName: string,
       schema: OpenAPIV3.SchemaObject,
       named = false,
-      derive: string | null = null,
+      derive: string[] = [],
+      attribute: string[] = [],
     ) {
       const name = changeCase.pascalCase(originalName);
       ctx.schemas.addExtra(template.SchemasExtra);
@@ -170,7 +181,13 @@ export function createSchema(ctx: Context) {
           template.enumeration(
             name,
             new Set(schema.enum),
-            `#[derive(Debug, ::serde::Serialize, ::serde::Deserialize, ::thiserror::Error)]`,
+            createDerive([
+              'Debug',
+              '::serde::Serialize',
+              '::serde::Deserialize',
+              '::thiserror::Error',
+              ...derive,
+            ]),
           ),
         );
         return `components::schemas::${changeCase.pascalCase(name)}`;
@@ -205,7 +222,15 @@ export function createSchema(ctx: Context) {
             reservedWord: keywords.includes(propName),
           });
         }
-        ctx.schemas.addComponent(name, template.struct(name, fields, template.DeruveSchemaStruct));
+        ctx.schemas.addComponent(
+          name,
+          template.struct(
+            name,
+            fields,
+            createDerive(['Debug', '::serde::Serialize', '::serde::Deserialize', ...derive]),
+            attribute,
+          ),
+        );
         return `components::schemas::${changeCase.pascalCase(name)}`;
       }
 
